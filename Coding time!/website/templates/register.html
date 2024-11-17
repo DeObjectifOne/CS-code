@@ -1,0 +1,40 @@
+{% extends "layout.html" %} {% block title %}Login{% endblock %}
+
+{% block content %}
+
+<form method="POST">
+
+    <!--Input box for user's username-->
+    <label>Username</label>
+    <input
+        type="username"
+        name="username"
+        required
+    >
+    <br>
+
+    <!--Input box for user's email-->
+    <label>Email</label>
+    <input
+        type="email"
+        name="email"
+        required
+    >
+    <br>
+
+    <!--Input box for user's password-->
+    <label>Password</label>
+    <input
+    type="password"
+    name="password"
+    required
+    >
+
+    <!--Submit button-->
+    <button
+        type="submit"
+    >Register</button>
+
+</form>
+
+{% endblock %}
