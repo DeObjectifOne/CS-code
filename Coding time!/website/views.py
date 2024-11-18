@@ -62,6 +62,15 @@ def login():
 
     return render_template('login.html')
 
+#logout function
+@views.route('/logout')
+@login_required
+def logout():
+    
+    #function that erases user session data
+    logout_user()
+    return redirect(url_for('views.login'))
+
 #route for the register page
 @views.route('/register')
 def register():
