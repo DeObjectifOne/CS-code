@@ -29,6 +29,37 @@ def settings():
 #route for the login page
 @views.route('/login')
 def login():
+    
+    #function that prevents the user from logging in again
+    #detects this by seeing if the user is authenticated
+    if current_user.is_authenticated:
+        flash('You are already logged in', category='info')
+        return redirect(url_for('views.home'))
+
+    #makes the user submit their email and password
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+
+        #function to make sure all fields are complete
+        if not email or not password:
+            flash('All fields are required', category='error')
+            return render_template('login.html')
+
+        #the user is then checked to see if they exist
+        user = User.query.filter_by(email=email).first()
+
+        #the user is then logged in if the user exists
+        #and if the password hashed equals the hashed password
+        if user and check_password_hash(user.password, password):
+            flash('Login successful', category='success')
+            login_user(user, remember=True)
+            return redirect(url_for('views.home'))
+        else:
+            #otherwise, the user is denied entry
+            flash('Invalid email or password', category='error')
+            return render_template('login.html')
+
     return render_template('login.html')
 
 #route for the register page
