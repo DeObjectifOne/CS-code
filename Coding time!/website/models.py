@@ -20,7 +20,7 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     details = db.Column(db.String(150), nullable=False)
     #uses the correct timezone to display the date of creation
-    creation_date = db.Column(db.DateTime(timezone=True), default=func.now())
+    creation_date = db.Column(db.DateTime, default=datetime.utcnow())
     due_date = db.Column(db.DateTime, nullable=True)
     duration = db.Column(db.Integer, nullable=False)
     priority = db.Column(db.String(50), nullable=False)
