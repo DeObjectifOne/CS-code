@@ -43,6 +43,9 @@ def create_app():
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(int(id))
-    
+
+    @app.context_processor
+    def inject_user():
+        return dict(user=current_user)
     
     return app
