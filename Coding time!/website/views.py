@@ -128,12 +128,14 @@ def register():
 
     return render_template('register.html', user=current_user)
 
+#Creates a method that lets the user add tasks to their database
 @views.route('/creation', methods=['GET', 'POST'])
 @login_required
 def create_task():
 
     try:
-
+        
+        #retrieves the data from creation.html 
         if request.method == 'POST':
             details = request.form.get("details")
             duration = request.form.get("duration")
@@ -141,11 +143,16 @@ def create_task():
             priority = request.form.get("priority")
             difficulty = request.form.get("difficulty")
 
+            #used to convert the due_date into a datetime variable
+            #this is so it can be displayed on the main page
             due_date = datetime.fromisoformat(due_date_str)
 
+            #checks if the data has been imported
             if not details:
                 flash("Task details are required", category='error')
             else:
+                
+                #all the data is imported to the database
                 from .models import Task
                 new_task = Task(
                     details=details,
@@ -155,11 +162,14 @@ def create_task():
                     difficulty=difficulty,
                     user_id=current_user.id
                 )
+                #the changes are commited
+                #the user then returns to the home page
                 db.session.add(new_task)
-                db.session.commit()
+                db.session.commit() 
                 flash("Task created successfully", category='success')
                 return redirect(url_for('views.home'))
     
+    #an error is displayed if the data could not be imported
     except ValueError:
         flash("Invalid input, try again", category="error")
         return redirect(url_for('create_task'))
