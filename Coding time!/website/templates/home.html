@@ -8,11 +8,13 @@
 <h1>Tidily Day Tracker</h1>
 
 <br><br>
+<!--Displays the username associated with the user-->
 <p>Welcome, {{ user.username }}</p>
 <br><br>
 
 {% for task in tasks %}
 
+    <!--Displays all the necessary task details-->
     <div>
         <h3>{{ task.details }}</h3>
         <p>Duration: {{ task.duration }} hours</p>
@@ -24,6 +26,7 @@
 
 {% else %}
 
+<!--The user is given a link to create more tasks incase there are none-->
 <p>Make a new task: <a href="{{ url_for('views.create_task') }}">Add Task</a> </p>
 
 {% endfor %}
