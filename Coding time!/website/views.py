@@ -17,9 +17,13 @@ from werkzeug.security import check_password_hash, generate_password_hash
 views = Blueprint('views', __name__)
 
 #route for the home page
-@views.route('/')
+@views.route('/home')
+@login_required
 def home():
-    return render_template('home.html')
+    
+    from .models import Task, User
+    tasks = Task.query.filter_by(user_id=current_user.id).all()
+    return render_template('home.html', user=current_user, tasks=tasks)
 
 #route for the settings page
 @views.route('/settings')
@@ -123,3 +127,41 @@ def register():
 
 
     return render_template('register.html', user=current_user)
+
+@views.route('/creation', methods=['GET', 'POST'])
+@login_required
+def create_task():
+
+    try:
+
+        if request.method == 'POST':
+            details = request.form.get("details")
+            duration = request.form.get("duration")
+            due_date_str = request.form.get("due_date")
+            priority = request.form.get("priority")
+            difficulty = request.form.get("difficulty")
+
+            due_date = datetime.fromisoformat(due_date_str)
+
+            if not details:
+                flash("Task details are required", category='error')
+            else:
+                from .models import Task
+                new_task = Task(
+                    details=details,
+                    duration=duration,
+                    due_date=due_date,
+                    priority=priority,
+                    difficulty=difficulty,
+                    user_id=current_user.id
+                )
+                db.session.add(new_task)
+                db.session.commit()
+                flash("Task created successfully", category='success')
+                return redirect(url_for('views.home'))
+    
+    except ValueError:
+        flash("Invalid input, try again", category="error")
+        return redirect(url_for('create_task'))
+
+    return render_template('creation.html', user=current_user)
