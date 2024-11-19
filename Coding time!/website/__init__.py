@@ -44,6 +44,7 @@ def create_app():
     def load_user(id):
         return User.query.get(int(id))
 
+    #used to insert the user each time they log into the website
     @app.context_processor
     def inject_user():
         return dict(user=current_user)
