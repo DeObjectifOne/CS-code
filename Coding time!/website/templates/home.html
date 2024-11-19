@@ -3,9 +3,29 @@
 
  {% block title %}Home{% endblock %} <!--Page title-->
  
- {% block content %} <!--Page body-->
+{% block content %} <!--Page body-->
  
- <h1>Tidily Day Tracker</h1>
- <p>Tasks: ...</p>
+<h1>Tidily Day Tracker</h1>
+
+<br><br>
+<p>Welcome, {{ user.username }}</p>
+<br><br>
+
+{% for task in tasks %}
+
+    <div>
+        <h3>{{ task.details }}</h3>
+        <p>Duration: {{ task.duration }} hours</p>
+        <p>Due Date: {{task.due_date }}</p>
+        <p>Created on: {{ task.creation_date.strftime('%Y-%m-%d') }}</p>
+        <p>Priority: {{ task.priority }}</p>
+        <p>Difficulty: {{ task.difficulty }}</p>
+    </div>
+
+{% else %}
+
+<p>Make a new task: <a href="{{ url_for('views.create_task') }}">Add Task</a> </p>
+
+{% endfor %}
  
- {% endblock %}
+{% endblock %}
