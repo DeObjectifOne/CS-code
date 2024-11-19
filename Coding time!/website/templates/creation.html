@@ -1,0 +1,75 @@
+ <!--extends layout.html's template to other webpages-->
+ {% extends "layout.html" %}
+
+ {% block title %}Task Creation{% endblock %} <!--Page title-->
+ 
+ {% block content %} <!--Page body-->
+ 
+ <br><br>
+ <h1>Create Tasks</h1> <!--Body title-->
+ <br><br>
+ 
+<form 
+    method="POST" 
+    action="{{ url_for('views.create_task') }}"
+> <!--Links the form that sends all the data to the create_task function-->
+
+    <!--Input for the task details-->
+    <input
+        type="text"
+        name="details"
+        placeholder="details"
+        required
+    >
+
+    <!--Input for the task duration-->
+    <input 
+        type="number"
+        name="duration"
+        placeholder="Duration (in hours)"
+        required
+    >
+
+    <!--Input for the due_date-->
+    <input 
+        type="datetime-local"
+        name="due_date"
+        placeholder="Due Date"
+        required
+    >
+
+    <!--Input for the task priority-->
+    <!--Can be used as a dropdown menu-->
+    <select
+        name="priority"
+        placeholder="priority"
+        required
+    >
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+    </select>
+
+    <!--Input for the task difficulty-->
+    <!--Can be used as a dropdown menu-->
+    <select
+        name="difficulty"
+        placeholder="difficulty"
+        required
+    >
+        <option value="Easy">Easy</option>
+        <option value="Medium">Medium</option>
+        <option value="Hard">Hard</option>
+    </select>
+
+    <!--submit button-->
+    <button
+        type="submit"
+    >
+        Create Task
+    </button>
+
+</form>
+
+ 
+ {% endblock %}
