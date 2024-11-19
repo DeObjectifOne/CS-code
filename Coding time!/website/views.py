@@ -20,7 +20,8 @@ views = Blueprint('views', __name__)
 @views.route('/home')
 @login_required
 def home():
-    
+
+    #all the inputted tasks are displayed on the home page
     from .models import Task, User
     tasks = Task.query.filter_by(user_id=current_user.id).all()
     return render_template('home.html', user=current_user, tasks=tasks)
