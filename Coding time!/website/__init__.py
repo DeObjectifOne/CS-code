@@ -26,8 +26,11 @@ def create_app():
     db.init_app(app)
 
     # Import and register blueprint
+    from .auth import auth
     from .views import views
-    app.register_blueprint(views)
+
+    app.register_blueprint(auth, url_prefix='/')
+    app.register_blueprint(views, url_prefix='/')
 
     #used to redirect users to the necessary pages upon booting up the website
     login_manager = LoginManager()
