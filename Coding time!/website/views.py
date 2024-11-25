@@ -5,13 +5,12 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 from . import db
 
 #import the user table to check for pre-existing users
-from .models import User
+from .models import Task
 
 #used to handle user data depending on their action
-from flask_login import login_user, login_required, logout_user, current_user
+from flask_login import login_required, current_user
 
-#used to make a WSGI (Web Server Gateway Interface) to handle user security
-from werkzeug.security import check_password_hash, generate_password_hash
+from datetime import datetime
 
 #blueprint for the views template
 views = Blueprint('views', __name__)
@@ -30,104 +29,6 @@ def home():
 @views.route('/settings')
 def settings():
     return render_template('settings.html')
-
-#route for the login page
-@views.route('/login')
-def login():
-    
-    #function that prevents the user from logging in again
-    #detects this by seeing if the user is authenticated
-    if current_user.is_authenticated:
-        flash('You are already logged in', category='info')
-        return redirect(url_for('views.home'))
-
-    #makes the user submit their email and password
-    if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
-
-        #function to make sure all fields are complete
-        if not email or not password:
-            flash('All fields are required', category='error')
-            return render_template('login.html')
-
-        #the user is then checked to see if they exist
-        user = User.query.filter_by(email=email).first()
-
-        #the user is then logged in if the user exists
-        #and if the password hashed equals the hashed password
-        if user and check_password_hash(user.password, password):
-            flash('Login successful', category='success')
-            login_user(user, remember=True)
-            return redirect(url_for('views.home'))
-        else:
-            #otherwise, the user is denied entry
-            flash('Invalid email or password', category='error')
-            return render_template('login.html')
-
-    return render_template('login.html')
-
-#logout function
-@views.route('/logout')
-@login_required
-def logout():
-    
-    #function that erases user session data
-    logout_user()
-    return redirect(url_for('views.login'))
-
-#route for the register page
-@views.route('/register')
-def register():
-
-    #function that prevents the user from registering
-    #detects this by seeing if the user is authenticated
-    if current_user.is_authenticated:
-        flash('You are already logged in', category='info')
-        return redirect(url_for('views.home'))
-
-    #main registration function
-    #retrieves user details
-    if request.method == "POST":
-        username = request.form.get("username")
-        email = request.form.get("email")
-        password = request.form.get("password")
-
-        #function to make sure all fields are complete
-        if not username or not email or not password:
-            flash('All fields are required', category='error')
-            return redirect(url_for('views.register'))
-
-        #the user's details are checked to see if a duplicate email exists
-        user = User.query.filter_by(email=email).first()
-
-        if user:
-            flash('A user with this email already exists', category='error')
-            return redirect(url_for('views.login'))
-        else:
-            try:
-                #the user is created as a variable with 3 attributes
-                new_user = User(
-                    username=username, 
-                    email=email, 
-                    #the password is hashed for increased security
-                    password=generate_password_hash(password, method='pbkdf2:sha256')
-                )
-                #the user is then added to the database
-                db.session.add(new_user)
-                db.session.commit()
-                #the application then remebers the user's login
-                login_user(new_user, remember=True)
-                flash('Registration successful')
-                return redirect(url_for('views.home'))
-            #function for if any errors occur during the process
-            except Exception as e:
-                db.session.rollback()
-                flash('An error occured while trying you register you, please try again')
-                print(f"Error: {e}")
-
-
-    return render_template('register.html', user=current_user)
 
 #Creates a method that lets the user add tasks to their database
 @views.route('/creation', methods=['GET', 'POST'])
@@ -176,3 +77,21 @@ def create_task():
         return redirect(url_for('create_task'))
 
     return render_template('creation.html', user=current_user)
+
+@views.route('/delete-task', methods=['POST'])
+def delete_task():
+    task_id = request.form.get('task_id')  # Get the task ID from the form data
+
+    if not task_id:
+        return "Task ID is required", 400
+
+    task = Task.query.get(task_id)  # Fetch the task from the database
+
+    if task and task.user_id == current_user.id:  # Ensure the task belongs to the logged-in user
+        db.session.delete(task)
+        db.session.commit()
+        flash("Task deleted successfully!", category="success")
+        return redirect(url_for('views.home'))  # Redirect back to the home page
+
+    flash("Task not found or you don't have permission to delete it.", category="error")
+    return redirect(url_for('views.home'))
