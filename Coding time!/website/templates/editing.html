@@ -1,0 +1,100 @@
+ <!--extends layout.html's template to other webpages-->
+ {% extends "layout.html" %}
+
+ {% block title %}Settings{% endblock %} <!--Page title-->
+ 
+ {% block content %} <!--Page body-->
+ 
+ <h1>Editing</h1>
+ 
+ <form method="POST" action="{{ url_for('views.edit_task', task_id=task.id) }}">
+
+    <div>
+        <label 
+            for="details">
+            Task Details:
+        </label>
+        <input 
+            type="text" 
+            id="details" 
+            name="details" 
+            value="{{ task.details }}" 
+            required
+        >
+    </div>
+
+    <div>
+        <label 
+            for="duration">
+            Duration (in hours):
+        </label>
+        <input 
+            type="number" 
+            id="duration" 
+            name="duration" 
+            value="{{ task.duration }}" 
+            required
+        >
+    </div>
+
+    <div>
+        <label 
+            for="due_date">
+            Due Date:
+        </label>
+        <input 
+            type="datetime-local" 
+            id="due_date" 
+            name="due_date" 
+            value="{{ task.due_date|datetimeformat }}"
+        >
+    </div>
+
+    <div>
+        <label 
+            for="priority">Priority:
+        </label>
+        <select
+            type="text" 
+            id="priority" 
+            name="priority" 
+            value="{{ task.priority }}" 
+            required
+        >
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="difficulty">
+            Difficulty:
+        </label>
+        <select
+            type="text" 
+            id="difficulty" 
+            name="difficulty" 
+            value="{{ task.difficulty }}" 
+            required
+        >
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+        </select>
+    </div>
+    
+    <button
+        type="submit">
+        Save Changes
+    </button>
+
+    <button 
+        onclick="history.back()">
+        Cancel
+    </button>
+
+</form>
+
+
+ {% endblock %}
