@@ -4,12 +4,13 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 #imports the database for data handling
 from . import db
 
-#import the user table to check for pre-existing users
+#import the task table to import data from it
 from .models import Task
 
 #used to handle user data depending on their action
 from flask_login import login_required, current_user
 
+#special import for the due_date function specifically
 from datetime import datetime
 
 #blueprint for the views template
@@ -78,51 +79,65 @@ def create_task():
 
     return render_template('creation.html', user=current_user)
 
+#task editing function
 @views.route('/edit-task/<int:task_id>', methods=['GET', 'POST'])
 @login_required
 def edit_task(task_id):
 
+    #task is retrieved using its id
     task = Task.query.get_or_404(task_id)
-    
+
+    #permission denied if the task id does not match with the user's current id
     if task.user_id != current_user.id:
         flash("You are not authorized to edit this task.", category="error")
         return redirect(url_for('views.home'))
-    
+
+    #the task details are retrieved
     if request.method == 'POST':
         task.details = request.form.get('details')
         task.duration = request.form.get('duration')
         task.due_date = request.form.get('due_date')
-        
+
+        #special retrieval for the due_date variable
+        #due to it being a datetime variable
+        #has to be retrieved while retaining the same format
         if task.due_date:
             try:
                 task.due_date = datetime.fromisoformat(task.due_date)
             except ValueError:
+                #error management if the variable could not be retrieved
                 flash("Invalid date format. Please try again.", category="error")
                 return redirect(url_for('views.edit_task', task_id=task_id))
-        
+
+        #the rest are retrieved normally
         task.priority = request.form.get('priority')
         task.difficulty = request.form.get('difficulty')
-        
+
+        #the changes the user made are then added to the home page
+        #if the user does not change a variable, that variable remains unchanged regardless
         db.session.commit()
         flash("Task updated successfully!", category="success")
         return redirect(url_for('views.home'))
     
     return render_template('editing.html', task=task)
 
+#delete task function
 @views.route('/delete-task', methods=['POST'])
 def delete_task():
-    task_id = request.form.get('task_id')  # Get the task ID from the form data
-
+    task_id = request.form.get('task_id') #gets task if for task recognition
     if not task_id:
         return "Task ID is required", 400
 
-    task = Task.query.get(task_id)  # Fetch the task from the database
+    task = Task.query.get(task_id)
 
-    if task and task.user_id == current_user.id:  # Ensure the task belongs to the logged-in user
+    #if the task matches the id and the user id
+    #the function goes ahead
+    if task and task.user_id == current_user.id:
         db.session.delete(task)
         db.session.commit()
         flash("Task deleted successfully!", category="success")
-        return redirect(url_for('views.home'))  # Redirect back to the home page
+        return redirect(url_for('views.home')) 
 
+    #made incase of error
     flash("Task not found or you don't have permission to delete it.", category="error")
     return redirect(url_for('views.home'))
