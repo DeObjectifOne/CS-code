@@ -6,9 +6,12 @@
  {% block content %} <!--Page body-->
  
  <h1>Editing</h1>
- 
+
+<!--establishes the connection to edit_task function in the views.py folder-->
  <form method="POST" action="{{ url_for('views.edit_task', task_id=task.id) }}">
 
+    <!--Used to display the initial task details-->
+    <!--Can be edited here-->
     <div>
         <label 
             for="details">
@@ -23,6 +26,8 @@
         >
     </div>
 
+    <!--Used to display the initial duration details-->
+    <!--Can be edited here-->
     <div>
         <label 
             for="duration">
@@ -37,6 +42,8 @@
         >
     </div>
 
+    <!--Used to display the initial due_date details-->
+    <!--Can be edited here-->
     <div>
         <label 
             for="due_date">
@@ -46,10 +53,13 @@
             type="datetime-local" 
             id="due_date" 
             name="due_date" 
+            <!--Makes sure that the datetime variable is displayed in the correct format-->
             value="{{ task.due_date|datetimeformat }}"
         >
     </div>
 
+    <!--Used to display the initial priority details-->
+    <!--Can be edited here-->
     <div>
         <label 
             for="priority">Priority:
@@ -67,6 +77,8 @@
         </select>
     </div>
 
+    <!--Used to display the difficulty details-->
+    <!--Can be edited here-->
     <div>
         <label for="difficulty">
             Difficulty:
@@ -89,6 +101,7 @@
         Save Changes
     </button>
 
+    <!--Used to go back to the previous page-->
     <button 
         onclick="history.back()">
         Cancel
