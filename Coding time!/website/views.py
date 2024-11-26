@@ -78,6 +78,37 @@ def create_task():
 
     return render_template('creation.html', user=current_user)
 
+@views.route('/edit-task/<int:task_id>', methods=['GET', 'POST'])
+@login_required
+def edit_task(task_id):
+
+    task = Task.query.get_or_404(task_id)
+    
+    if task.user_id != current_user.id:
+        flash("You are not authorized to edit this task.", category="error")
+        return redirect(url_for('views.home'))
+    
+    if request.method == 'POST':
+        task.details = request.form.get('details')
+        task.duration = request.form.get('duration')
+        task.due_date = request.form.get('due_date')
+        
+        if task.due_date:
+            try:
+                task.due_date = datetime.fromisoformat(task.due_date)
+            except ValueError:
+                flash("Invalid date format. Please try again.", category="error")
+                return redirect(url_for('views.edit_task', task_id=task_id))
+        
+        task.priority = request.form.get('priority')
+        task.difficulty = request.form.get('difficulty')
+        
+        db.session.commit()
+        flash("Task updated successfully!", category="success")
+        return redirect(url_for('views.home'))
+    
+    return render_template('editing.html', task=task)
+
 @views.route('/delete-task', methods=['POST'])
 def delete_task():
     task_id = request.form.get('task_id')  # Get the task ID from the form data
