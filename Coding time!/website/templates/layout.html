@@ -20,16 +20,20 @@ Ss<!DOCTYPE html>
 
     <!--Basic navbar for testing-->
     <nav>
+        
     <nav>
+        <!--Only certain tabs can be accessed when the user is logged in-->
         {% if user.is_authenticated %}
             <a href="{{ url_for('views.home') }}">Home</a>
             <a href="{{ url_for('views.create_task') }}">Add Task</a>
             <a href="{{ url_for('views.settings') }}">Settings</a>
             <a href="{{ url_for('auth.logout') }}">Logout</a>
         {% else %}
+        <!--This is the same for when they are logged out-->
             <a href="{{ url_for('auth.login') }}">Login</a>
             <a href="{{ url_for('auth.register') }}">Register</a>
         {% endif %}
+        
     </nav>
 
     </nav>
