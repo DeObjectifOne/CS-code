@@ -52,10 +52,11 @@ def create_app():
     def inject_user():
         return dict(user=current_user)
 
-        @app.template_filter('datetimeformat')
-        def datetimeformat(value):
-            if value:
-                return value.strftime('%Y-%m-%dT%H:%M')
-            return ''
+    #used to make sure that any datetime objects are formatted correctly
+    @app.template_filter('datetimeformat')
+    def datetimeformat(value):
+        if value:
+            return value.strftime('%Y-%m-%dT%H:%M')
+        return ''
     
     return app
