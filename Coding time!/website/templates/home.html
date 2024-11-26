@@ -24,6 +24,17 @@
         <p>Difficulty: {{ task.difficulty }}</p>
 
         <form 
+            action="{{ url_for('views.edit_task', task_id=task.id) }}" 
+            method="GET">
+            <button 
+                type="submit" 
+                class="btn btn-primary">
+                    Edit
+            </button>
+        </form>
+        <br><br>
+     
+        <form 
             action="{{ url_for('views.delete_task') }}" 
             method="POST"
         >
