@@ -21,10 +21,41 @@ views = Blueprint('views', __name__)
 @login_required
 def home():
 
-    #all the inputted tasks are displayed on the home page
-    from .models import Task, User
-    tasks = Task.query.filter_by(user_id=current_user.id).all()
-    return render_template('home.html', user=current_user, tasks=tasks)
+    #search query is empty for user entry
+    search_query = ""
+
+    if request.method == 'POST':
+        search_query = request.form.get('search', "")
+
+        #tasks are filtered for specific characters
+        tasks = Task.query.filter(
+            #confirmation to ask if task id matches the user's current id
+            Task.user_id == current_user.id,
+            #uses the ilike function to filter out words specifically
+            Task.details.ilike(f"%{search_query}%")
+        ).all()
+    else:
+        #displays all the user's tasks regardless of the search function
+        tasks= Task.query.filter_by(user_id=current_user.id).all()
+
+    #the filtered function for tasks_due_today is returned to the user
+    today = datetime.utcnow().date()
+    tasks_due_today = [task for task in tasks if task.due_date and task.due_date.date() == today]
+
+    #the filtered function for completed_tasks is returned
+    completed_tasks = [task for task in tasks if task.completed]
+    #the filtered function for starred_tasks is returned
+    starred_tasks = [task for task in tasks if task.starred]
+
+    return render_template(
+        'home.html', 
+        user=current_user, 
+        tasks=tasks, 
+        search_query=search_query,
+        tasks_due_today=tasks_due_today,
+        completed_tasks=completed_tasks,
+        starred_tasks=starred_tasks
+    )
 
 #route for the settings page
 @views.route('/settings')
@@ -140,4 +171,49 @@ def delete_task():
 
     #made incase of error
     flash("Task not found or you don't have permission to delete it.", category="error")
+    return redirect(url_for('views.home'))
+
+#function to filter the user tasks
+@views.route('/filter', methods=['GET', 'POST'])
+def filter_tasks():
+
+    filter_type = request.form.get('filter')
+
+    #filter types by using the models.py variables
+    #they are all ordered in accordance with said variable
+    if filter_type == 'creation_date':
+        tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.creation_date.desc()).all()
+    elif filter_type == 'due_date':
+        tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.due_date.desc()).all()
+    elif filter_type == 'completed':
+        tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.completed.desc()).all()
+    elif filter_type == 'starred':
+        tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.starred.desc()).all()
+    else:
+        tasks = Task.query.filter_by(user_id=current_user.id).all()
+
+    return render_template ('home.html', user=current_user, tasks=tasks)
+
+#function to confirm if a task is completed/starred
+@views.route('update-task', methods=['POST'])
+def update_task():
+
+    task_id = request.form.get('task_id')
+    action = request.form.get('action')
+    task = Task.query.get(task_id)
+
+    #both variables 'completed' and 'starred' are marked as false boolean variables
+    #they become true once activated
+    #these changes update the user task
+    #they can then be sorted by 'tasks completed' or task 'starred'
+    if task and task.user_id == current_user.id:
+        if action == "complete":
+            task.completed = not task.completed
+        elif action == "star":
+            task.starred = not task.starred
+        db.session.commit()
+        flash(f"Task '{task.details}' updated successfully", category="success")
+    else:
+        flash("Task not found or unable to be updated", category='error')
+
     return redirect(url_for('views.home'))
