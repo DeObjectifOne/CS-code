@@ -25,5 +25,8 @@ class Task(db.Model):
     duration = db.Column(db.Integer, nullable=False)
     priority = db.Column(db.String(50), nullable=False)
     difficulty = db.Column(db.String(50), nullable=False)
+    #variables used for task filtering
+    completed = db.Column(db.Boolean, default=False)
+    starred = db.Column(db.Boolean, default=False)
     #variable used to link all tasks back to the required user
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
