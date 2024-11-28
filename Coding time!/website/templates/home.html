@@ -12,6 +12,54 @@
 <p>Welcome, {{ user.username }}</p>
 <br><br>
 
+<!--search button to find tasks-->
+<form 
+    method="POST"
+    action="{{ url_for('views.home') }}"
+>
+
+    <!--Tasks are searched for using the search_query function-->
+    <input
+        type="text"
+        name="search"
+        placeholder="search tasks..."
+        value="{{ search_query }}"
+    >
+    <button
+        type="submit"
+        class="btn btn-primary"
+    >
+        Search
+    </button>
+
+</form>
+
+<!--task query function-->
+<form
+    method="POST"
+    action="{{ url_for('views.filter_tasks') }}"
+>
+
+    <select
+        name="filter"
+    >
+        <!--Selection for the different filter functions-->
+        <option value="creation_date">Most recently created tasks</option>
+        <option value="due_date">Tasks due today</option>
+        <option value="completed">Tasks completed</option>
+        <option value="starred">Starred</option>
+
+    </select>
+
+    <button
+        type="submit"
+        class="btn btn-primary"
+    >
+        Filter
+    </button>
+
+</form>
+
 {% for task in tasks %}
 
     <!--Displays all the necessary task details-->
@@ -23,6 +71,64 @@
         <p>Priority: {{ task.priority }}</p>
         <p>Difficulty: {{ task.difficulty }}</p>
 
+        <!--checkbox function for 'completed tasks'-->
+        <form
+            method = 'POST'
+            action="{{ url_for('views.update_task') }}"
+        >
+
+            <input
+                type="hidden"
+                name="task_id"
+                value="{{ task.id }}"
+            >
+
+            <input
+                type="hidden"
+                name="action"
+                value="complete"
+            >
+
+            <label>
+                <input
+                    type="checkbox"
+                    onchange="this.form.submit()"
+                    {% if task.completed %} checked {% endif %}
+                >
+                Mark as completed
+            </label>
+
+        </form>
+
+        <!--checkbox function for 'starred tasks'-->
+        <form
+            method = 'POST'
+            action="{{ url_for('views.update_task') }}"
+        >
+
+            <input
+                type="hidden"
+                name="task_id"
+                value="{{ task.id }}"
+            >
+
+            <input
+                type="hidden"
+                name="action"
+                value="star"
+            >
+
+            <label>
+                <input
+                    type="checkbox"
+                    onchange="this.form.submit()"
+                    {% if task.starred %} checked {% endif %}
+                >
+                Star
+            </label>
+
+        </form>
+     
         <form 
             action="{{ url_for('views.edit_task', task_id=task.id) }}" 
             method="GET">
