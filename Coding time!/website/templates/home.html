@@ -40,15 +40,13 @@
     action="{{ url_for('views.filter_tasks') }}"
 >
 
-    <select
+ <select
         name="filter"
     >
-        <!--Selection for the different filter functions-->
-        <option value="creation_date">Most recently created tasks</option>
-        <option value="due_date">Tasks due today</option>
-        <option value="completed">Tasks completed</option>
-        <option value="starred">Starred</option>
-
+        <option value="creation_date" {% if filter_type == 'creation_date' %}selected{% endif %}>Most recently created tasks</option>
+        <option value="due_date" {% if filter_type == 'due_date' %}selected{% endif %}>Tasks due today</option>
+        <option value="completed" {% if filter_type == 'completed' %}selected{% endif %}>Tasks completed</option>
+        <option value="starred" {% if filter_type == 'starred' %}selected{% endif %}>Starred</option>
     </select>
 
     <button
@@ -74,7 +72,7 @@
         <!--checkbox function for 'completed tasks'-->
         <form
             method = 'POST'
-            action="{{ url_for('views.update_task') }}"
+            action="{{ url_for('utils.update_task') }}"
         >
 
             <input
@@ -103,7 +101,7 @@
         <!--checkbox function for 'starred tasks'-->
         <form
             method = 'POST'
-            action="{{ url_for('views.update_task') }}"
+            action="{{ url_for('utils.update_task') }}"
         >
 
             <input
@@ -130,7 +128,7 @@
         </form>
      
         <form 
-            action="{{ url_for('views.edit_task', task_id=task.id) }}" 
+            action="{{ url_for('utils.edit_task', task_id=task.id) }}" 
             method="GET">
             <button 
                 type="submit" 
@@ -141,7 +139,7 @@
         <br><br>
      
         <form 
-            action="{{ url_for('views.delete_task') }}" 
+            action="{{ url_for('utils.delete_task') }}" 
             method="POST"
         >
             <input 
@@ -165,5 +163,10 @@
 <p>Make a new task: <a href="{{ url_for('views.create_task') }}">Add Task</a> </p>
 
 {% endfor %}
- 
+
+<br><br>
+<form method="POST" action="{{ url_for('sort.sort_tasks') }}">
+    <button type="submit">Sort Tasks</button>
+</form>
+
 {% endblock %}
