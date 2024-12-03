@@ -58,38 +58,18 @@
         >
     </div>
 
-    <!--Used to display the initial priority details-->
-    <!--Can be edited here-->
     <div>
-        <label 
-            for="priority">Priority:
-        </label>
-        <select
-            type="text" 
-            id="priority" 
-            name="priority" 
-            value="{{ task.priority }}" 
-            required
-        >
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
+        <label for="priority">Priority</label>
+        <select name="priority" id="priority">
             <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
         </select>
     </div>
 
-    <!--Used to display the difficulty details-->
-    <!--Can be edited here-->
     <div>
-        <label for="difficulty">
-            Difficulty:
-        </label>
-        <select
-            type="text" 
-            id="difficulty" 
-            name="difficulty" 
-            value="{{ task.difficulty }}" 
-            required
-        >
+        <label for="difficulty">Difficulty</label>
+        <select name="difficulty" id="difficulty">
             <option value="Easy">Easy</option>
             <option value="Medium">Medium</option>
             <option value="Hard">Hard</option>
