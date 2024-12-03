@@ -38,29 +38,54 @@
         required
     >
 
-    <!--Input for the task priority-->
-    <!--Can be used as a dropdown menu-->
-    <select
-        name="priority"
-        placeholder="priority"
-        required
-    >
-        <option value="High">High</option>
-        <option value="Medium">Medium</option>
-        <option value="Low">Low</option>
-    </select>
+     <div>
+        <label 
+            for="priority">
+                Priority (1,2 and 3 for high, medium, low):
+        </label>
+        <select 
+            name="priority" 
+            id="priority"
+        >
+            <option 
+                value="3">
+                Low
+            </option>
+            <option 
+                value="2">
+                Medium
+            </option>
+            <option 
+                value="1">
+                High
+            </option>
+        </select>
+    </div>
 
-    <!--Input for the task difficulty-->
-    <!--Can be used as a dropdown menu-->
-    <select
-        name="difficulty"
-        placeholder="difficulty"
-        required
-    >
-        <option value="Easy">Easy</option>
-        <option value="Medium">Medium</option>
-        <option value="Hard">Hard</option>
-    </select>
+    <div>
+        <label 
+            for="difficulty">
+            Difficulty (1,2 and 3 for easy, medium, hard):
+        </label>
+        <select 
+            name="difficulty" 
+            id="difficulty"
+        >
+            <option 
+                value="1">
+                Easy
+            </option>
+            <option 
+                value="2">
+                Medium
+            </option>
+            <option 
+                value="3">
+                Hard
+            </option>
+        </select>
+    </div>
+
 
     <!--submit button-->
     <button
