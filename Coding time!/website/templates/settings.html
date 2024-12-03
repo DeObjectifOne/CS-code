@@ -1,11 +1,91 @@
- <!--extends layout.html's template to other webpages-->
- {% extends "layout.html" %}
+<!--extends layout.html's template to other webpages-->
+{% extends "layout.html" %}
 
- {% block title %}Settings{% endblock %} <!--Page title-->
+{% block title %}Settings{% endblock %} <!--Page title-->
  
- {% block content %} <!--Page body-->
+{% block content %} <!--Page body-->
  
- <h1>Settings</h1>
- <p>Options: ...</p>
+<h1>Settings</h1>
+
+<p id="error-message" style="color: red; display: none;">
+    Total of all weightings must equal 1.
+</p>
+
+<form method="POST" action="{{ url_for('views.settings') }}">
+
+    <label for="weight_due_date">Due Date Weight</label>
+    <input
+        type="number"
+        id="weight_due_date"
+        name="weight_due_date"
+        value="{{ user_preferences.weight_due_date }}"
+        min="0"
+        max="1"
+        step="0.01"
+        oninput="validateWeights()">
+
+    <label for="weight_duration">Duration Weight</label>
+    <input
+        type="number"
+        id="weight_duration"
+        name="weight_duration"
+        value="{{ user_preferences.weight_duration }}"
+        min="0"
+        max="1"
+        step="0.01"
+        oninput="validateWeights()">
+
+    <label for="weight_priority">Priority Weight</label>
+    <input
+        type="number"
+        id="weight_priority"
+        name="weight_priority"
+        value="{{ user_preferences.weight_priority }}"
+        min="0"
+        max="1"
+        step="0.01"
+        oninput="validateWeights()">
+
+    <label for="weight_difficulty">Difficulty Weight</label>
+    <input
+        type="number"
+        id="weight_difficulty"
+        name="weight_difficulty"
+        value="{{ user_preferences.weight_difficulty }}"
+        min="0"
+        max="1"
+        step="0.01"
+        oninput="validateWeights()">
+
+    <button type="submit" id="save-button" disabled>Save Preferences</button>
+</form>
+
+<script>
+function validateWeights() {
+    const weights = [
+        parseFloat(document.getElementById("weight_due_date").value) || 0,
+        parseFloat(document.getElementById("weight_duration").value) || 0,
+        parseFloat(document.getElementById("weight_priority").value) || 0,
+        parseFloat(document.getElementById("weight_difficulty").value) || 0,
+    ];
+
+    const totalWeight = weights.reduce((a, b) => a + b, 0);
+    const errorMessage = document.getElementById("error-message");
+    const saveButton = document.getElementById("save-button");
+
+    if (totalWeight > 1) {
+        errorMessage.style.display = "block";
+        errorMessage.textContent = "Total weight cannot exceed 1.";
+        saveButton.disabled = true;
+    } else if (totalWeight < 1) {
+        errorMessage.style.display = "block";
+        errorMessage.textContent = "Total weight must equal 1.";
+        saveButton.disabled = true;
+    } else {
+        errorMessage.style.display = "none";
+        saveButton.disabled = false;
+    }
+}
+</script>
  
- {% endblock %}
+{% endblock %}
