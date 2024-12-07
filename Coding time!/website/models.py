@@ -69,3 +69,5 @@ class Preferences(db.Model):
     #variable used to link all the user's preferences back to the required user
     #a ForeignKey is used so the Preferences class is directly linked back to the User class
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    #variable to save the user's theme for either light or dark mode
+    theme = db.Column(db.String(10), default='light')
