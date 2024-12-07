@@ -113,3 +113,61 @@ def register():
 
 
     return render_template('register.html', user=current_user)
+
+@auth.route('/update-account', methods=['GET', 'POST'])
+@login_required
+def update_account():
+
+    if request.method == 'POST':
+
+        new_username = request.form.get('username')
+        new_email = request.form.get('email')
+        new_password = request.form.get('password')
+
+        existing_user = User.query.filter_by(email=new_email).first()
+
+        if existing_user and existing_user.id != current_user.id:
+            flash("You are already using this email", category="error")
+            return redirect(url_for('views.settings'))
+
+        current_user.username = new_username
+        current_user.email = new_email
+        current_user.password = new_password
+
+        if new_password:
+
+            from werkzeug.security import generate_password_hash
+            current_user.password = generate_password_hash(new_password)
+
+        db.session.commit()
+
+        flash("Account updated successfully", category="success")
+        return redirect(url_for('views.home'))
+
+    return render_template('settings.html', user=current_user)
+
+@auth.route('/delete-account', methods=['GET', 'POST'])
+@login_required
+def delete_account():
+    if request.method == 'POST':
+
+        user = User.query.get(current_user.id)
+
+        if user:
+
+            Task.query.filter_by(user_id=user.id).delete()
+            Preferences.query.filter_by(user_id=user.id).delete()
+
+            db.session.delete(user)
+            db.session.commit()
+
+            flash('Your account and all associated data have been successfully deleted.', category='success')
+            return redirect(url_for('auth.login'))
+
+        
+        else:
+
+            flash('Account not found.', category='error')
+            return redirect(url_for('views.settings'))
+
+    return redirect(url_for('views.settings'))
