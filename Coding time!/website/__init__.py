@@ -36,12 +36,14 @@ def create_app():
     from .views import views
     from .utils import utils
     from .sort import sort
+    from .customization import customization
 
     #makes the url link for these blueprints valid
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(utils, url_prefix='/')
     app.register_blueprint(sort, url_prefix='/')
+    app.register_blueprint(customization, url_prefix='/')
 
     #used to redirect users to the necessary pages upon booting up the website
     login_manager = LoginManager()
@@ -49,7 +51,7 @@ def create_app():
     login_manager.init_app(app)
 
     # Import models so tables can be created
-    from .models import User, Task
+    from .models import User, Task, Preferences
     with app.app_context():
         db.create_all()
 
@@ -64,6 +66,20 @@ def create_app():
     def inject_user():
         return dict(user=current_user)
 
+    @app.before_request
+    def redirect_if_not_logged_in():
+        if not current_user.is_authenticated:
+            if request.endpoint not in ['auth.login', 'auth.register', 'auth.reset_password']:
+                return redirect(url_for('auth.login')) 
+
+    @app.before_request
+    def apply_user_theme():
+        if current_user.is_authenticated:
+            preferences = Preferences.query.filter_by(user_id=current_user.id).first()
+            g.theme = preferences.theme if preferences and preferences.theme else 'light'
+        else:
+            g.theme = session.get('theme', 'light') 
+    
     #used to make sure that any datetime objects are formatted correctly
     #this allows for better display and editing of the task
     @app.template_filter('datetimeformat')
