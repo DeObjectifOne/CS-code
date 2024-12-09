@@ -1,170 +1,120 @@
- <!--extends layout.html's template to other webpages-->
- {% extends "layout.html" %}
+{% extends "layout.html" %} {% block title %}Home{% endblock %} <!--Page title-->
+ 
+{% block content %}
 
- {% block title %}Home{% endblock %} <!--Page title-->
- 
-{% block content %} <!--Page body-->
- 
 <h1>Tidily Day Tracker</h1>
 
-<br><br>
-<!--Displays the username associated with the user-->
+<br>
+
 <p>Welcome, {{ user.username }}</p>
-<br><br>
 
-<!--search button to find tasks-->
-<form 
-    method="POST"
-    action="{{ url_for('views.home') }}"
->
+<br>
 
-    <!--Tasks are searched for using the search_query function-->
+<form method="POST" action="{{ url_for('views.home') }}">
+
     <input
         type="text"
         name="search"
         placeholder="search tasks..."
-        value="{{ search_query }}"
-    >
-    <button
-        type="submit"
-        class="btn btn-primary"
-    >
-        Search
-    </button>
+        value="{{ search_query }}">
+
+    <button type="submit" class="btn btn-primary">Search</button>
 
 </form>
 
-<!--task query function-->
-<form
-    method="POST"
-    action="{{ url_for('views.filter_tasks') }}"
->
+<form method="POST" action="{{ url_for('views.filter_tasks') }}">
 
- <select
-        name="filter"
-    >
-        <option value="creation_date" {% if filter_type == 'creation_date' %}selected{% endif %}>Most recently created tasks</option>
-        <option value="due_date" {% if filter_type == 'due_date' %}selected{% endif %}>Tasks due today</option>
-        <option value="completed" {% if filter_type == 'completed' %}selected{% endif %}>Tasks completed</option>
-        <option value="starred" {% if filter_type == 'starred' %}selected{% endif %}>Starred</option>
+    <select name="filter">
+        <option value="creation_date" {% if filter_type 
+            == 'creation_date' %}selected{% endif %}>Most recently created tasks</option>
+        <option value="due_date" {% if filter_type 
+            == 'due_date' %}selected{% endif %}>Tasks due today</option>
+        <option value="completed" {% if filter_type 
+            == 'completed' %}selected{% endif %}>Tasks completed</option>
+        <option value="starred" {% if filter_type 
+            == 'starred' %}selected{% endif %}>Starred</option>
     </select>
 
-    <button
-        type="submit"
-        class="btn btn-primary"
-    >
-        Filter
-    </button>
+    <button type="submit" class="btn btn-primary">Filter</button>
 
 </form>
 
 {% for task in tasks %}
 
-    <!--Displays all the necessary task details-->
     <div>
+
         <h3>{{ task.details }}</h3>
-        <p>Duration: {{ task.duration }} hours</p>
-        <p>Due Date: {{task.due_date }}</p>
-        <p>Created on: {{ task.creation_date.strftime('%Y-%m-%d') }}</p>
-        <p>Priority: {{ task.priority }}</p>
-        <p>Difficulty: {{ task.difficulty }}</p>
 
-        <!--checkbox function for 'completed tasks'-->
-        <form
-            method = 'POST'
-            action="{{ url_for('utils.update_task') }}"
-        >
+        <ul>
+            <li>Duration: {{ task.duration }} hours</li>
+            <li>Due Date: {{task.due_date }}</li>
+            <li>Created on: {{ task.creation_date.strftime('%Y-%m-%d') }}</li>
+            <li>Priority: {{ task.priority }}</li>
+            <li>Difficulty: {{ task.difficulty }}</li>
+        </ul>
 
-            <input
-                type="hidden"
-                name="task_id"
-                value="{{ task.id }}"
-            >
+        <br>
 
-            <input
-                type="hidden"
-                name="action"
-                value="complete"
-            >
+        <form method = 'POST' action="{{ url_for('utils.update_task') }}">
 
+            <input type="hidden" name="task_id" value="{{ task.id }}">
+            <input type="hidden" name="action" value="complete">
             <label>
                 <input
                     type="checkbox"
                     onchange="this.form.submit()"
-                    {% if task.completed %} checked {% endif %}
-                >
+                    {% if task.completed %} checked {% endif %}>
                 Mark as completed
             </label>
 
         </form>
 
-        <!--checkbox function for 'starred tasks'-->
-        <form
-            method = 'POST'
-            action="{{ url_for('utils.update_task') }}"
-        >
+        <form method = 'POST' action="{{ url_for('utils.update_task') }}">
 
-            <input
-                type="hidden"
-                name="task_id"
-                value="{{ task.id }}"
-            >
-
-            <input
-                type="hidden"
-                name="action"
-                value="star"
-            >
-
+            <input type="hidden" name="task_id" value="{{ task.id }}">
+            <input type="hidden" name="action" value="star">
             <label>
                 <input
                     type="checkbox"
                     onchange="this.form.submit()"
-                    {% if task.starred %} checked {% endif %}
-                >
-                Star
+                    {% if task.starred %} checked {% endif %}>
+                Star Task
             </label>
 
         </form>
      
-        <form 
-            action="{{ url_for('utils.edit_task', task_id=task.id) }}" 
-            method="GET">
-            <button 
-                type="submit" 
-                class="btn btn-primary">
-                    Edit
+        <form action="{{ url_for('utils.edit_task', task_id=task.id) }}" method="GET">
+
+            <button type="submit" class="btn btn-primary">
+                Edit
             </button>
+
         </form>
-        <br><br>
+
+        <br>
      
-        <form 
-            action="{{ url_for('utils.delete_task') }}" 
-            method="POST"
-        >
-            <input 
-                type="hidden" 
-                name="task_id" 
-                value="{{ task.id }}"
-            >
+        <form action="{{ url_for('utils.delete_task') }}" method="POST">
+
+            <input type="hidden" name="task_id" value="{{ task.id }}">
             <button 
                 type="submit" 
                 class="btn btn-danger" 
                 onclick="return confirm('Are you sure you want to delete this task?')">
                 Delete
             </button>
+
         </form>
      
     </div>
 
 {% else %}
 
-<!--The user is given a link to create more tasks incase there are none-->
 <p>Make a new task: <a href="{{ url_for('views.create_task') }}">Add Task</a> </p>
 
 {% endfor %}
 
-<br><br>
+<br>
+
 <form method="POST" action="{{ url_for('sort.sort_tasks') }}">
     <button type="submit">Sort Tasks</button>
 </form>
