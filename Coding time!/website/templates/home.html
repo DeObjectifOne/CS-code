@@ -31,7 +31,7 @@
 
 <br>
 
-<h1 align="center">Tidily Day Tracker</h1>
+<h1 align="center"><b>Tidily Day Tracker</b></h1>
 
 <br>
 
@@ -40,78 +40,76 @@
 <br>
 
 <div class="container">
-    <div class="row">
-        <div class="col-md-10 mx-auto">
-            <nav 
-                id="custom-navbar"
-                class="navbar navbar-expand navbar-light bg-light">
+    <div class="row justify-content-center">
+        <nav 
+            id="custom-navbar" 
+            class="navbar navbar-expand navbar-light bg-light d-flex justify-content-center">
 
-                <form
-                    method="POST"
-                    action="{{ url_for('utils.filter_tasks') }}"
-                    class="d-inline">
-                    <input
-                        type="hidden"
-                        name="filter"
-                        value="creation_date">
-                    <button
-                        type="submit"
-                        class="btn custom-btn"
-                        {% if filter_type == 'creation_date' %}active{% endif %}>
-                        Recently Created Tasks
-                    </button>
-                </form>
+            <form
+                method="POST"
+                action="{{ url_for('utils.filter_tasks') }}"
+                class="d-inline">
+                <input
+                    type="hidden"
+                    name="filter"
+                    value="creation_date">
+                <button
+                    type="submit"
+                    class="btn custom-btn"
+                    {% if filter_type == 'creation_date' %}active{% endif %}>
+                    Recently Created Tasks
+                </button>
+            </form>
 
-                <form
-                    method="POST"
-                    action="{{ url_for('utils.filter_tasks') }}"
-                    class="d-inline">
-                    <input
-                        type="hidden"
-                        name="filter"
-                        value="due_date">
-                    <button
-                        type="submit"
-                        class="btn custom-btn"
-                        {% if filter_type == 'due_date' %}active{% endif %}>
-                        Tasks due today
-                    </button>
-                </form>
+            <form
+                method="POST"
+                action="{{ url_for('utils.filter_tasks') }}"
+                class="d-inline">
+                <input
+                    type="hidden"
+                    name="filter"
+                    value="due_date">
+                <button
+                    type="submit"
+                    class="btn custom-btn"
+                    {% if filter_type == 'due_date' %}active{% endif %}>
+                    Tasks due today
+                </button>
+            </form>
                         
-                <form
-                    method="POST"
-                    action="{{ url_for('utils.filter_tasks') }}"
-                    class="d-inline">
-                    <input
-                        type="hidden"
-                        name="filter"
-                        value="completed">
-                    <button
-                        type="submit"
-                        class="btn custom-btn"
-                        {% if filter_type == 'completed' %}active{% endif %}>
-                        Completed Tasks
-                    </button>
-                </form>
+            <form
+                method="POST"
+                action="{{ url_for('utils.filter_tasks') }}"
+                class="d-inline">
+                <input
+                    type="hidden"
+                    name="filter"
+                    value="completed">
+                <button
+                    type="submit"
+                    class="btn custom-btn"
+                    {% if filter_type == 'completed' %}active{% endif %}>
+                    Completed Tasks
+                </button>
+            </form>
 
-                <form
-                    method="POST"
-                    action="{{ url_for('utils.filter_tasks') }}"
-                    class="d-inline">
-                    <input
-                        type="hidden"
-                        name="filter"
-                        value="starred">
-                    <button
-                        type="submit"
-                        class="btn custom-btn"
-                        {% if filter_type == 'starred' %}active{% endif %}>
-                        Starred Tasks
-                    </button>
-                </form>
+            <form
+                method="POST"
+                action="{{ url_for('utils.filter_tasks') }}"
+                class="d-inline">
+                <input
+                    type="hidden"
+                    name="filter"
+                    value="starred">
+                <button
+                    type="submit"
+                    class="btn custom-btn"
+                    {% if filter_type == 'starred' %}active{% endif %}>
+                    Starred Tasks
+                </button>
+            </form>
 
-            </nav>
-        </div>
+        </nav>
     </div>
 </div>
 
