@@ -1,3 +1,9 @@
+#Blueprint imported so the function can be exported as a package
+#render_template imported to load html pages upon user interaction
+#request imported so data can be sent and retrieved upon user request
+#flash imported for user notifications incase there is an error/success
+#redirect import used to send user to webpages upon user interaction
+#url_for imported for link referencing in python functions
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 
 from . import db
