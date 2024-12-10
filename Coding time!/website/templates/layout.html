@@ -155,10 +155,10 @@
 
     <script>
 
-        const lightModeRadio = document.getElementById('lightMode');
-        const darkModeRadio = document.getElementById('darkMode');
-
         document.addEventListener('DOMContentLoaded', function () {
+            const lightModeRadio = document.getElementById('light');
+            const darkModeRadio = document.getElementById('dark');
+
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme) {
                 document.body.className = savedTheme;
@@ -168,17 +168,39 @@
                     lightModeRadio.checked = true;
                 }
             }
-        });
 
-        lightModeRadio.addEventListener('change', () => {
-            document.body.className = 'light';
-            localStorage.setItem('theme', 'light');
-        });
+            lightModeRadio.addEventListener('change', () => {
+                changeTheme('light');
+            });
 
-        darkModeRadio.addEventListener('change', () => {
-            document.body.className = 'dark';
-            localStorage.setItem('theme', 'dark');
+            darkModeRadio.addEventListener('change', () => {
+                changeTheme('dark');
+            });
+
+            function changeTheme(theme) {
+
+                document.body.className = theme;
+
+                localStorage.setItem('theme', theme);
+
+                fetch('/save_theme', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `theme=${theme}`,
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        console.error('Failed to update theme on the server');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error while changing theme:', error);
+                });
+            }
         });
+        
     </script>
 
 </body>
