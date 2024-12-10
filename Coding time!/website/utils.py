@@ -146,24 +146,38 @@ def delete_task():
     #in the task table
     task_id = request.form.get('task_id') 
 
+    #if the task id is not returned, the user is flashed a message
+    #this is because it cannot find a task without an id
     if not task_id:
         return "Task ID is required", 400
 
+    #the task id is then retrieved from the Task table
     task = Task.query.get(task_id) 
 
+    #the task id is then checked to see if the task is linked to the user table
+    #if it's linked to the table, then the database is cleared of the task
+    #the user is then messaged
     if task and task.user_id == current_user.id:  
         db.session.delete(task)
         db.session.commit()
         flash("Task deleted successfully!", category="success")
         return redirect(url_for('views.home'))
 
+    #the user is flashed with an error message if the task isn't unable to be deleted
     flash("Task not found or you don't have permission to delete it.", category="error")
     return redirect(url_for('views.home'))
 
+#task filtering functions
 @utils.route('/filter', methods=['GET', 'POST'])
 def filter_tasks():
+
+    #the filter type is made a variable that equates to the user's choice
     filter_type = request.form.get('filter')
 
+    #the filter types are listed below 
+    #they work by using a query function related to the task
+    #the tasks are then sorted in descending order
+    #
     if filter_type == 'creation_date':
         tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.creation_date.desc()).all()
     elif filter_type == 'due_date':
