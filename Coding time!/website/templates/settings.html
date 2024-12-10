@@ -1,255 +1,266 @@
-<!--extends layout.html's template to other webpages-->
-{% extends "layout.html" %}
-
-{% block title %}Settings{% endblock %} <!--Page title-->
+{% extends "layout.html" %} {% block title %}Settings{% endblock %}
  
-{% block content %} <!--Page body-->
+{% block content %}
  
-<h1>Settings</h1>
+<style>
 
-<p id="error-message" style="color: red; display: none;">
-    Total of all weightings must equal 1.
+    #custom-navbar {
+        background-color: transparent !important;
+        border: none; 
+    }
+
+</style>
+
+<br>
+
+<h1 align="center"><b>Settings</b></h1>
+
+<br>
+
+<h3 align="center"><b>Adjusts weights</b></h3>
+
+<br>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <nav 
+            id="custom-navbar" 
+            class="navbar navbar-expand navbar-light bg-light d-flex justify-content-center">
+            <form
+                method="POST"
+                action="{{ url_for('views.settings') }}">
+
+            <div class="d-inline">
+                <label for="weight_due_date">
+                    Due Date
+                </label>
+                <input
+                    type="number"
+                    id="weight_due_date"
+                    name="weight_due_date"
+                    value="{{ user_preferences.weight_due_date }}"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    oninput="validateWeights()">
+            </div>
+                
+            <div class="d-inline">
+                <label for="weight_duration">
+                    Duration
+                </label>
+                <input
+                    type="number"
+                    id="weight_duration"
+                    name="weight_duration"
+                    value="{{ user_preferences.weight_duration }}"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    oninput="validateWeights()">
+            </div>
+
+            <div class="d-inline">
+                <label for="weight_priority">
+                    Priority
+                </label>
+                <input
+                    type="number"
+                    id="weight_priority"
+                    name="weight_priority"
+                    value="{{ user_preferences.weight_priority }}"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    oninput="validateWeights()">
+            </form>
+
+            <div class="d-inline">
+                <label for="weight_difficulty">
+                    Priority
+                </label>
+                <input
+                    type="number"
+                    id="weight_difficulty"
+                    name="weight_difficulty"
+                    value="{{ user_preferences.weight_difficulty }}"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    oninput="validateWeights()">
+            </div>
+
+            <div class="d-flex justify-content-center align-items-center">
+                <button
+                    type="submit"
+                    id="save-button"
+                    class="btn btn-primary"
+                    disabled>
+                    Save Preferences
+                </button>
+            </div>
+
+            </form>
+        </nav>
+    </div>
+</div>
+
+<p 
+    id="error-message" 
+    style="color: red; display: none;">
+    The weightings must equal 1
 </p>
 
 <br>
-<h3>Adjusts weightings</h3>
+
+<h3 align="center"><b>Change Theme</b></h3>
 
 <br>
-<form method="POST" action="{{ url_for('views.settings') }}">
 
-    <!--When inputting the weights, the max is capped at 1 and the min is 0-->
-    <!--This is to ensure the user cannot go beyond the weigh requirements-->
-    <!--all the data is sent to specific variables in sort.py-->
-    <ul>
+<div class="text-center">
+    <form>
 
-        <li>
-            <label 
-                for="weight_due_date"
-            >
-                Due Date Weight
-            </label>
-            <input
-                type="number"
-                id="weight_due_date"
-                name="weight_due_date"
-                value="{{ user_preferences.weight_due_date }}"
-                min="0"
-                max="1"
-                step="0.01"
-                oninput="validateWeights()"
-            >
-        </li>
-        
-        <li>
-            <label 
-                for="weight_duration"
-            >
-                Duration Weight
-            </label>
-            <input
-                type="number"
-                id="weight_duration"
-                name="weight_duration"
-                value="{{ user_preferences.weight_duration }}"
-                min="0"
-                max="1"
-                step="0.01"
-                oninput="validateWeights()"
-            >
-        </li>
+        <h3>Choose Theme</h3>
+        <input 
+            type="radio" 
+            id="light" 
+            name="theme" 
+            value="light" 
+            {% if current_user.theme == 'light' %}checked{% endif %}
+            onchange="changeTheme(this.value)"
+        >
+        <label 
+            for="light"
+        >
+            Light Mode
+        </label><br>
 
-        <li>
-            <label 
-                for="weight_priority"
-            >
-                Priority Weight
-            </label>
-            <input
-                type="number"
-                id="weight_priority"
-                name="weight_priority"
-                value="{{ user_preferences.weight_priority }}"
-                min="0"
-                max="1"
-                step="0.01"
-                oninput="validateWeights()"
-            >
-        </li>
+        <input 
+            type="radio" 
+            id="dark" 
+            name="theme" 
+            value="dark" 
+            {% if current_user.theme == 'dark' %}checked{% endif %}
+            onchange="changeTheme(this.value)"
+        >
+        <label 
+            for="dark"
+        >
+            Dark Mode
+        </label>
 
-        <li>
-            <label 
-                for="weight_difficulty"
-            >
-                Difficulty Weight
-            </label>
-            <input
-                type="number"
-                id="weight_difficulty"
-                name="weight_difficulty"
-                value="{{ user_preferences.weight_difficulty }}"
-                min="0"
-                max="1"
-                step="0.01"
-                oninput="validateWeights()"
-            >
-        </li>
-
-        <li>
-            <button 
-                type="submit" 
-                id="save-button" 
-                disabled
-            >
-                Save Preferences
-            </button>
-        </li>
-
-    </ul>
-
-</form>
+    </form>
+</div>
 
 <br>
-<form>
 
-    <h3>Choose Theme</h3>
-    <input 
-        type="radio" 
-        id="light" 
-        name="theme" 
-        value="light" 
-        {% if current_user.theme == 'light' %}checked{% endif %}
-        onchange="changeTheme(this.value)"
-    >
-    <label 
-        for="light"
-    >
-        Light Mode
-    </label><br>
-
-    <input 
-        type="radio" 
-        id="dark" 
-        name="theme" 
-        value="dark" 
-        {% if current_user.theme == 'dark' %}checked{% endif %}
-        onchange="changeTheme(this.value)"
-    >
-    <label 
-        for="dark"
-    >
-        Dark Mode
-    </label>
-    <br>
-
-</form>
+<h3 align=center><b>Change account details</b></h3>
 
 <br>
-<h3>Change account details</h3>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form
+                action="{{ url_for('auth.update_account') }}"
+                method="POST"
+            >
+
+                <div class="mb-3">
+                    <label for="username">
+                        Username:
+                    </label>
+                    <input 
+                        type="username" 
+                        name="username"
+                        id="username" 
+                        class="form-control"
+                        value="{{ current_user.username }}"
+                        placeholder="Enter your username">
+                </div>
+
+                <div class="mb-3">
+                    <label for="email">
+                        Email:
+                    </label>
+                    <input 
+                        type="email" 
+                        name="email"
+                        id="email" 
+                        class="form-control"
+                        value="{{ current_user.email }}"
+                        placeholder="Enter your email">
+                </div>
+
+                <div class="mb-3">
+                    <label for="password">
+                        Password:
+                    </label>
+                    <input 
+                        type="password" 
+                        name="password"
+                        id="password" 
+                        class="form-control"
+                        value="{{ current_user.password }}"
+                        placeholder="Enter your password">
+                </div>
+
+                <div class="text-center"
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+                        Save Changes
+                    </button>
+            
+                    <form
+                        action="{{ url_for('auth.delete_account') }}"
+                        method="POST"
+                        onsubmit="return confirm('Are you sure you want to delete your account?, this action cannot be undone')">
+                        <button
+                            type="submit"
+                            class="btn btn-danger">
+                            Delete Account
+                        </button>
+                    </form>
+            
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
 
 <br>
-<form
-    action="{{ url_for('auth.update_account') }}"
-    method="POST"
->
-
-    <ul>
-
-        <li>
-            <label
-                for="username"
-            >
-                Username:
-            </label>
-            <input
-                type="username"
-                id="username"
-                name="username"
-                value="{{ current_user.username }}"
-            >
-        </li>
-
-        <li>
-            <label
-                for="email"
-            >
-                New Email:
-            </label>
-            <input
-                type="email"
-                id="email"
-                name="email"
-                value="{{ current_user.email }}"
-            >
-        </li>
-
-        <li>
-            <label
-                for="password"
-            >
-                New password:
-            </label>
-            <input
-                type="password"
-                id="password"
-                name="password"
-                value="{{ current_user.password }}"
-            >
-        </li>
-
-        <li>
-            <button
-                type="submit"
-            >
-                Save Changes
-            </button>
-        </li>
-    
-    </ul>
-
-</form>
-
-<br>
-<form
-    action="{{ url_for('auth.delete_account') }}"
-    method="POST"
-    onsubmit="return confirm('Are you sure you want to delete your account?, this action cannot be undone')"
->
-
-    <button
-        type="submit"
-        class="btn btn-danger"
-    >
-        Delete Account
-    </button>
-
-</form>
 
 <script>
-function validateWeights() {
-    const weights = [
-        parseFloat(document.getElementById("weight_due_date").value) || 0,
-        parseFloat(document.getElementById("weight_duration").value) || 0,
-        parseFloat(document.getElementById("weight_priority").value) || 0,
-        parseFloat(document.getElementById("weight_difficulty").value) || 0,
-    ];
 
-    const totalWeight = weights.reduce((a, b) => a + b, 0);
-    const errorMessage = document.getElementById("error-message");
-    const saveButton = document.getElementById("save-button");
+    function validateWeights() {
+        const weights = [
+            parseFloat(document.getElementById("weight_due_date").value) || 0,
+            parseFloat(document.getElementById("weight_duration").value) || 0,
+            parseFloat(document.getElementById("weight_priority").value) || 0,
+            parseFloat(document.getElementById("weight_difficulty").value) || 0,
+        ];
 
-    if (totalWeight > 1) {
-        errorMessage.style.display = "block";
-        errorMessage.textContent = "Total weight cannot exceed 1.";
-        saveButton.disabled = true;
-    } else if (totalWeight < 1) {
-        errorMessage.style.display = "block";
-        errorMessage.textContent = "Total weight must equal 1.";
-        saveButton.disabled = true;
-    } else {
-        errorMessage.style.display = "none";
-        saveButton.disabled = false;
+        const totalWeight = weights.reduce((a, b) => a + b, 0);
+        const errorMessage = document.getElementById("error-message");
+        const saveButton = document.getElementById("save-button");
+
+        if (totalWeight > 1) {
+            errorMessage.style.display = "block";
+            errorMessage.textContent = "Total weight cannot exceed 1.";
+            saveButton.disabled = true;
+        } else if (totalWeight < 1) {
+            errorMessage.style.display = "block";
+            errorMessage.textContent = "Total weight must equal 1.";
+            saveButton.disabled = true;
+        } else {
+            errorMessage.style.display = "none";
+            saveButton.disabled = false;
+        }
     }
-}
+
 </script>
 
 <script>
