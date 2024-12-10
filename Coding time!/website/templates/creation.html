@@ -1,100 +1,105 @@
- <!--extends layout.html's template to other webpages-->
- {% extends "layout.html" %}
-
- {% block title %}Task Creation{% endblock %} <!--Page title-->
+{% extends "layout.html" %} {% block title %}Task Creation{% endblock %}
  
- {% block content %} <!--Page body-->
+{% block content %}
  
- <br><br>
- <h1>Create Tasks</h1> <!--Body title-->
- <br><br>
+<br>
+
+<h1 align="center"><b>Create Tasks</b></h1>
+
+<br>
  
-<form 
-    method="POST" 
-    action="{{ url_for('views.create_task') }}"
-> <!--Links the form that sends all the data to the create_task function-->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form 
+                method="POST" 
+                action="{{ url_for('views.create_task') }}">
 
-    <!--Input for the task details-->
-    <input
-        type="text"
-        name="details"
-        placeholder="details"
-        required
-    >
+                <div class="mb-3">
+                    <label for="details">Task Details:</label>
+                    <div class="input-group justify-content-center">
+                        <input 
+                            type="text" 
+                            id="details" 
+                            name="details" 
+                            class="form-control"
+                            placeholder="details"
+                            required>
+                    </div>
+                </div>
+    
+                <div class="mb-3">
+                    <label for="details">Duration (in hours):</label>
+                    <div class="input-group justify-content-center">
+                        <input 
+                            type="number" 
+                            id="duration" 
+                            name="duration" 
+                            class="form-control"
+                            placeholder="duration"
+                            required>
+                    </div>
+                </div>
 
-    <!--Input for the task duration-->
-    <input 
-        type="number"
-        name="duration"
-        placeholder="Duration (in hours)"
-        required
-    >
+                <div class="mb-3">
+                    <label for="details">Date of completion:</label>
+                    <div class="input-group justify-content-center">
+                        <input 
+                            type="datetime-local" 
+                            id="due_date" 
+                            name="due_date" 
+                            class="form-control"
+                            placeholder="Date of completion"
+                            required>
+                    </div>
+                </div>
 
-    <!--Input for the due_date-->
-    <input 
-        type="datetime-local"
-        name="due_date"
-        placeholder="Due Date"
-        required
-    >
+                <div class="mb-3">
+                    <label for="priority">Priority (1,2 and 3 for high, medium, low):</label>
+                    <div class="input-group justify-content-center">
+                        <select 
+                            name="priority" 
+                            id="priority"
+                            class="form-control">
+                            <option value="3">Low</option>
+                            <option value="2">Medium</option>
+                            <option value="1">High</option>
+                        </select>
+                    </div>
+                </div>
 
-     <div>
-        <label 
-            for="priority">
-                Priority (1,2 and 3 for high, medium, low):
-        </label>
-        <select 
-            name="priority" 
-            id="priority"
-        >
-            <option 
-                value="3">
-                Low
-            </option>
-            <option 
-                value="2">
-                Medium
-            </option>
-            <option 
-                value="1">
-                High
-            </option>
-        </select>
+                <div class="mb-3">
+                    <label for="difficulty">Difficulty (1,2 and 3 for easy, medium, hard):</label>
+                    <div class="input-group justify-content-center">
+                        <select 
+                            name="difficulty" 
+                            id="difficulty"
+                            class="form-control">
+                            <option value="1">Easy</option>
+                            <option value="2">Medium</option>
+                            <option value="3">Hard</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+                        Create Task
+                    </button>
+                    <button 
+                        onclick="history.back()"
+                        class="btn btn-secondary">
+                        Cancel
+                    </button>
+                </div>
+
+            </form>
+        </div>
     </div>
+</div>
 
-    <div>
-        <label 
-            for="difficulty">
-            Difficulty (1,2 and 3 for easy, medium, hard):
-        </label>
-        <select 
-            name="difficulty" 
-            id="difficulty"
-        >
-            <option 
-                value="1">
-                Easy
-            </option>
-            <option 
-                value="2">
-                Medium
-            </option>
-            <option 
-                value="3">
-                Hard
-            </option>
-        </select>
-    </div>
-
-
-    <!--submit button-->
-    <button
-        type="submit"
-    >
-        Create Task
-    </button>
-
-</form>
-
+<br>
  
  {% endblock %}
