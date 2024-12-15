@@ -17,7 +17,7 @@ from datetime import datetime
 views = Blueprint('views', __name__)
 
 #route for the home page
-@views.route('/home')
+@views.route('/home', methods=['GET', 'POST'])
 @login_required
 def home():
 
@@ -25,7 +25,7 @@ def home():
     search_query = ""
 
     if request.method == 'POST':
-        search_query = request.form.get('search', "")
+        search_query = request.form.get('search', "").strip
 
         #tasks are filtered for specific characters
         tasks = Task.query.filter(
