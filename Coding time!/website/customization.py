@@ -30,29 +30,28 @@ customization = Blueprint('customization', __name__)
 @login_required
 def save_theme():
 
-    #the function begins by detecting the user's theme
-    #the theme variable will then equal the user's theme of choice
     theme = request.form.get('theme')
-    if theme in ['light', 'dark']:
+    
+    if theme not in ['light', 'dark']:
+        return jsonify({'success': False, 'error': 'Invalid theme'}), 400
+    
+    try:
+        # Update the session with the chosen theme
         session['theme'] = theme
-        #if the theme is already saved, flask will go into the database
-        #it will then locate the Preferences table
-        #it will scan the preference table for the theme variable
-        #if its already set, the website retains their theme of choice
-        #even after their previous session
+
+        # Fetch or create user preferences for saving the theme
         preferences = Preferences.query.filter_by(user_id=current_user.id).first()
         if not preferences:
-            #if the column is empty
-            #the new choice is added to the table insted
             preferences = Preferences(user_id=current_user.id, theme=theme)
             db.session.add(preferences)
         else:
-            #the original theme can be retained
-            #if there has been no usage of it
             preferences.theme = theme
+
+        # Commit changes to the database
         db.session.commit()
 
-        #jsonifty notifies the user if the operation was successful
         return jsonify({'success': True})
-    #otherwise, it returns an error
-    return jsonify({'success': False}), 400
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
