@@ -31,52 +31,57 @@ utils = Blueprint('utils', __name__)
 @login_required
 def create_task():
     
+#function that allows the user to make a new task
+@utils.route('/creation', methods=['GET', 'POST'])
+@login_required
+def create_task():
+    
     try:
             #the user inputs on creation.html are retrieved
             #the duration variable is retrieved as a float
             #as the user's input will not always be a whole number
             if request.method == 'POST':
-            details = request.form.get("details")
-            duration = float(request.form.get('duration', 0))
-            due_date_str = request.form.get("due_date")
+                details = request.form.get("details")
+                duration = float(request.form.get('duration', 0))
+                due_date_str = request.form.get("due_date")
 
-            #the priority and difficulty variables are mapped out
-            #this is to make it easier for the sorting algorithm
-            #to use these 2 functions during sorting
-            priority_map = {"Low": 3, "Medium": 2, "High": 1}
-            difficulty_map = {"Easy": 1, "Medium": 2, "Hard": 3}
+                #the priority and difficulty variables are mapped out
+                #this is to make it easier for the sorting algorithm
+                #to use these 2 functions during sorting
+                priority_map = {"Low": 3, "Medium": 2, "High": 1}
+                difficulty_map = {"Easy": 1, "Medium": 2, "Hard": 3}
 
-            #the mapped variables are then remapped to the user's preference
-            #so they can be properly sorted when the user eventually sorts them
-            priority = priority_map.get(request.form.get('priority'), 1)  
-            difficulty = difficulty_map.get(request.form.get('difficulty'), 1)  
-            #the due_date is imported as a datetime variable for proper sorting
-            due_date = datetime.fromisoformat(due_date_str)
+                #the mapped variables are then remapped to the user's preference
+                #so they can be properly sorted when the user eventually sorts them
+                priority = priority_map.get(request.form.get('priority'), 1)  
+                difficulty = difficulty_map.get(request.form.get('difficulty'), 1)  
+                #the due_date is imported as a datetime variable for proper sorting
+                due_date = datetime.fromisoformat(due_date_str)
 
-            #this makes sure the user has an input in task details
-            #as a blank task would be unsearchable
-            if not details:
-                flash("Task details are required", category='error')
-            else:
-                #a new task variable is created
-                #it contains the user's new inputs
-                #before assigning them to the user
-                #via their id
-                new_task = Task(
-                    details=details,
-                    duration=duration,
-                    due_date=due_date,
-                    priority=priority,
-                    difficulty=difficulty,
-                    user_id=current_user.id
-                )
-                db.session.add(new_task)
-                db.session.commit()
-                flash("Task created successfully", category='success')
-                #the user is then redirected to the home page
-                #where they can see their tasks displayed
-                #using home.html
-                return redirect(url_for('views.home'))
+                #this makes sure the user has an input in task details
+                #as a blank task would be unsearchable
+                if not details:
+                    flash("Task details are required", category='error')
+                else:
+                    #a new task variable is created
+                    #it contains the user's new inputs
+                    #before assigning them to the user
+                    #via their id
+                    new_task = Task(
+                        details=details,
+                        duration=duration,
+                        due_date=due_date,
+                        priority=priority,
+                        difficulty=difficulty,
+                        user_id=current_user.id
+                    )
+                    db.session.add(new_task)
+                    db.session.commit()
+                    flash("Task created successfully", category='success')
+                    #the user is then redirected to the home page
+                    #where they can see their tasks displayed
+                    #using home.html
+                    return redirect(url_for('views.home'))
     
     except ValueError:
         #if there is an invalid input from the user, this comes up
