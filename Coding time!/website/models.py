@@ -36,6 +36,7 @@ class Task(db.Model):
     #stores the task details for searching
     details = db.Column(db.String(150), nullable=False)
     #uses the correct timezone to display the date of creation
+    due_date = db.Column(db.DateTime, nullable=True)
     creation_date = db.Column(db.DateTime, default=datetime.utcnow())
     duration = db.Column(db.Integer, nullable=False)
     #these two variables, though displayed as string variables, are stored as integers
