@@ -153,6 +153,8 @@
                 <div>Created on: {{ task.creation_date.strftime('%Y-%m-%d') }}</div>
                 <div>Priority: {{ task.priority }}</div>
                 <div>Difficulty: {{ task.difficulty }}</div>
+                <div class="separator"></div>
+                <div><strong>Notes: </strong>{{ task.notes or "" }}</div>
             </div>
 
             <br>
