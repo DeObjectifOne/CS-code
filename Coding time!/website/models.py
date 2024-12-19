@@ -43,6 +43,7 @@ class Task(db.Model):
     #this is due to the variables being mapped to numbers upon their entry
     priority = db.Column(db.Integer, nullable=False)
     difficulty = db.Column(db.Integer, nullable=False)
+    notes = db.Column(db.Text, nullable=True)
     #variables used for task filtering
     completed = db.Column(db.Boolean, default=False)
     starred = db.Column(db.Boolean, default=False)
