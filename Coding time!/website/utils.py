@@ -57,6 +57,7 @@ def create_task():
                 difficulty = difficulty_map.get(request.form.get('difficulty'), 1)  
                 #the due_date is imported as a datetime variable for proper sorting
                 due_date = datetime.fromisoformat(due_date_str)
+                notes = request.form.get('notes')
 
                 #this makes sure the user has an input in task details
                 #as a blank task would be unsearchable
@@ -73,6 +74,7 @@ def create_task():
                         due_date=due_date,
                         priority=priority,
                         difficulty=difficulty,
+                        notes=notes,
                         user_id=current_user.id
                     )
                     db.session.add(new_task)
@@ -113,6 +115,7 @@ def edit_task(task_id):
         task.details = request.form.get('details')
         task.duration = float(request.form.get('duration', 0))
         task.due_date = request.form.get('due_date')
+        task.notes = request.form.get('notes')
 
         priority_map = {"Low": 3, "Medium": 2, "High": 1}
         difficulty_map = {"Easy": 1, "Medium": 2, "Hard": 3}
