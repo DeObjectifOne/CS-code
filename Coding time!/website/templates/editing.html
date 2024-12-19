@@ -84,6 +84,22 @@
                 </div>
 
                 <br>
+             
+                <div class="mb-3">
+                    <label for="notes">Notes:</label>
+                    <div class="input-group justify-content-center">
+                        <textarea 
+                            id="notes" 
+                            name="notes" 
+                            class="form-control" 
+                            placeholder="Add any notes here" 
+                            rows="3">
+                            {{ task.notes or '' }}
+                        </textarea>
+                    </div>
+                </div>
+
+                <br>
 
                 <div class="text-center">
                     <button
