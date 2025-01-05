@@ -20,35 +20,44 @@ auth = Blueprint('auth', __name__)
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
 
-    #function that prevents the user from logging in again
-    #detects this by seeing if the user is authenticated
+    # Prevent already authenticated users from logging in again
     if current_user.is_authenticated:
-        flash('You are already logged in', category='info')
+        flash('You are already logged in', 'info')
         return redirect(url_for('views.home'))
 
-    #makes the user submit their email and password
+    # Initialize login_attempts in the session if it doesn't exist
+    if 'login_attempts' not in session:
+        session['login_attempts'] = 0
+
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
 
-        #function to make sure all fields are complete
+        # Ensure all fields are completed
         if not email or not password:
-            flash('All fields are required', category='error')
+            flash('All fields are required', 'danger')
             return render_template('login.html')
 
-        #the user is then checked to see if they exist
+        # Check if user exists
         user = User.query.filter_by(email=email).first()
 
-        #the user is then logged in if the user exists
-        #and if the password hashed equals the hashed password
+        # If user exists and password matches
         if user and check_password_hash(user.password, password):
-            flash('Login successful', category='success')
+            session['login_attempts'] = 0  # Reset attempts on successful login
+            flash('Login successful', 'success')
             login_user(user, remember=True)
             return redirect(url_for('views.home'))
-        else:
-            #otherwise, the user is denied entry
-            flash('Invalid email or password', category='error')
-            return render_template('login.html')
+
+        # Increment login_attempts on failed login
+        session['login_attempts'] += 1
+
+        # Limit login attempts to prevent brute force attacks
+        if session['login_attempts'] >= 5:
+            flash('Too many failed attempts. Please reset your password.', 'danger')
+            return redirect(url_for('auth.reset_password'))
+
+        flash('Invalid email or password', 'danger')
+        return render_template('login.html')
 
     return render_template('login.html')
 
