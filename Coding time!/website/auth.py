@@ -250,4 +250,3 @@ def delete_account():
             return redirect(url_for('views.settings'))
 
     return redirect(url_for('views.settings'))
-
