@@ -114,6 +114,34 @@ def register():
 
     return render_template('register.html', user=current_user)
 
+@auth.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        if not email or not new_password or not confirm_password:
+            flash("All fields are required.", 'danger')
+            return render_template('reset_password.html')
+
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            flash("No account found with this email.", 'danger')
+            return render_template('reset_password.html')
+
+        if new_password != confirm_password:
+            flash("Passwords do not match.", 'danger')
+            return render_template('reset_password.html')
+
+        user.password = generate_password_hash(new_password)
+        db.session.commit()
+
+        flash("Password reset successful. Please log in.", 'danger')
+        return redirect(url_for('auth.login'))
+
+    return render_template('reset_password.html')
+
 @auth.route('/update-account', methods=['GET', 'POST'])
 @login_required
 def update_account():
