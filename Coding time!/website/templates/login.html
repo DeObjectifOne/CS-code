@@ -1,20 +1,30 @@
-{% extends "layout.html" %} {% block title %}Register{% endblock %}
+{% extends "layout.html" %} {% block title %}Register{% endblock %}<!--Page title-->
 
 {% block content %}
 
 <br>
 
-<h1 align="center"><b>Login</b></h1>
+<h1 align="center"><b>Login</b></h1><!--Bold title to draw user attention-->
 
 <br>
 
+<!--container class used to keep the input box in the margins-->
+<!--gives the input box consistency when adjusting for screen size-->
 <div class="container">
+    <!--used to align the box horizontally in the center-->
+    <!--the grid system is used to help with this-->
     <div class="row justify-content-center">
+        <!--'col-md-6' defines how large an input box will be-->
+        <!--The max is 12, so the box takes 6 out of 12 boxes in the grid system-->
         <div class="col-md-6">
             <form 
                 method="POST" 
                 action="{{ url_for('auth.login') }}">
-
+                <!--Each input boxes receives the class mb-3-->
+                <!--'mb-3' defines the amount of spacing inbetween elements-->
+                <!--the grid system is used, so there are 3 grid spaces inbetween each element-->
+                <!--form control is use to style the input boxes for each element-->
+                <!--it normally bevels the corners and makes them look sleeker-->
                 <div class="mb-3">
                     <input 
                         type="email" 
@@ -33,8 +43,12 @@
                         placeholder="Enter your password">
                 </div>
 
+                <!--The additional usage of align center is done for the vertical axis-->
+                <!--Ensures elements are perfectly aligned on all axis-->
                 <div 
                     class="d-flex justify-content-center align-items-center">
+                    <!--mx-3 is used for spacing elements between each other-->
+                    <!--is also used to space them out with the margins-->
                     <button 
                         type="submit" 
                         class="btn btn-primary mx-3">
@@ -46,7 +60,7 @@
                         Reset Password
                     </a>
                 </div>
-                
+
             </form>
         </div>
     </div>
