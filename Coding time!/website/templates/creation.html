@@ -1,9 +1,13 @@
-{% extends "layout.html" %} {% block title %}Task Creation{% endblock %}
+{% extends "layout.html" %} {% block title %}Task Creation{% endblock %}<!--Page title-->
  
 {% block content %}
 
 <style>
 
+    /*The CSS tags are used to styalise the page*/
+    /*In this instance, its to give a consistant composition*/
+    /*To all elements that use the attribute 'form-control'*/
+    /*Makes the text look neatly aligned and comfortable*/
     textarea.form-control {
         padding: 5px;     
         text-align: left;     
@@ -16,17 +20,26 @@
 
 <br>
 
-<h1 align="center"><b>Create Tasks</b></h1>
+<h1 align="center"><b>Create Tasks</b></h1><!--Bold title to draw user attention-->
 
 <br>
  
+<!--container class used to keep the input box in the margins-->
+<!--gives the input box consistency when adjusting for screen size-->
 <div class="container">
+    <!--used to align the box horizontally in the center-->
+    <!--the grid system is used to help with this-->
     <div class="row justify-content-center">
         <div class="col-md-6">
             <form 
                 method="POST" 
-                action="{{ url_for('views.create_task') }}">
+                action="{{ url_for('utils.create_task') }}">
 
+                <!--Each input boxes receives the class mb-3-->
+                <!--'mb-3' defines the amount of spacing inbetween elements-->
+                <!--the grid system is used, so there are 3 grid spaces inbetween each element-->
+                <!--form control is use to style the input boxes for each element-->
+                <!--it normally bevels the corners and makes them look sleeker-->
                 <div class="mb-3">
                     <label for="details">Task Details:</label>
                     <div class="input-group justify-content-center">
@@ -53,6 +66,9 @@
                     </div>
                 </div>
 
+                <!--for this particular element, the type is set to datetime-local-->
+                <!--this allows for some browser, like google, to bring up a calendar-->
+                <!--the user can then manually select the date of their choice-->
                 <div class="mb-3">
                     <label for="details">Date of completion:</label>
                     <div class="input-group justify-content-center">
@@ -94,8 +110,9 @@
                     </div>
                 </div>
 
-                <br>
-             
+                <!--'rows=3' limits the amount of text visible to the user-->
+                <!--exceeding 3 lines means the user has to scrool down-->
+                <!--this is done to limit the size of the input box for visual convenience-->
                 <div class="mb-3">
                     <label for="details">Notes:</label>
                     <div class="input-group justify-content-center">
@@ -109,14 +126,14 @@
                     </div>
                 </div>
 
-                <br>
-             
                 <div class="text-center">
                     <button
                         type="submit"
                         class="btn btn-primary">
                         Create Task
                     </button>
+                    <!--onlick="history.back" acts as a cancel button-->
+                    <!--it essentially backtracks on the page the user was sent to-->
                     <button 
                         onclick="history.back()"
                         class="btn btn-secondary">
