@@ -4,11 +4,17 @@
 
 <style>
 
+    /*stylizes the navbar so it avoids being altered by the theme change*/
+    /*achieved by giving the attribute the !important tag*/
+    /*border removed to give it a clean look*/
         #custom-navbar {
         background-color: transparent !important;
         border: none; 
     }
 
+    /*All buttons are made transparent*/
+    /*This is so they can look loke the background color*/
+    /*This also means the text in the buttons is contrasting the background*/
     .custom-btn {
         background-color: transparent;
         border: 1px solid #ccc;
@@ -16,11 +22,15 @@
         transition: background-color 0.3s, color 0.3s;
     }
 
+    /*used for a hover effect on all buttons*/
+    /*slightly darkens the button to indicate the user is interacting with it*/
     .custom-btn:hover {
         background-color: rgba(0, 0, 0, 0.1);
         color: #000; 
     }
 
+    /*used for any active buttons*/
+    /*darkens the button more than the hover effect to establish that a button is being used*/
     .custom-btn.active {
         background-color: rgba(0, 0, 0, 0.2);
         border-color: #555;
@@ -31,20 +41,39 @@
 
 <br>
 
+<!--Titled made bold to attract the user's attention-->
 <h1 align="center"><b>Tidily Day Tracker</b></h1>
 
 <br>
 
+<!--Username used to introduce the user to the home page-->
 <p align="center">Welcome, {{ user.username }}</p>
 
 <br>
 
+<!--container class used to keep the input box in the margins-->
+<!--gives the input box consistency when adjusting for screen size-->
 <div class="container">
+    <!--used to align the box horizontally in the center-->
+    <!--the grid system is used to help with this-->
     <div class="row justify-content-center">
+        <!--Navbar class used to denote an item menu-->
+        <!--This navbar class in particular is for the filter options-->
+        <!--'navbar-expand' makes the navbar adjustable depending on screen size-->
+        <!--navbar-light makes the navbar contrast with the background so it's distinct -->
+        <!--bg-light applies a grey background to each selectable box within the navbar for stylization-->
         <nav 
             id="custom-navbar" 
             class="navbar navbar-expand navbar-light bg-light d-flex justify-content-center">
 
+            <!--Each box uses the 'd-inline' tag-->
+            <!--This forces each element next to each other horizontally-->
+            <!--Each button is established under a 'custom-btn' class-->
+            <!--This allows for each button to be styled by CSS-->
+            <!--Each button can detect whether the filter is active or not-->
+            <!--In response to being active, the button is highlighted-->
+
+            <!--Filter option for the most recent tasks-->
             <form
                 method="POST"
                 action="{{ url_for('utils.filter_tasks') }}"
@@ -61,6 +90,7 @@
                 </button>
             </form>
 
+            <!--Filter option for tasks due today-->
             <form
                 method="POST"
                 action="{{ url_for('utils.filter_tasks') }}"
@@ -77,6 +107,7 @@
                 </button>
             </form>
                         
+            <!--Filter option for already completed tasks-->
             <form
                 method="POST"
                 action="{{ url_for('utils.filter_tasks') }}"
@@ -93,6 +124,7 @@
                 </button>
             </form>
 
+            <!--Filter option for starred tasks-->
             <form
                 method="POST"
                 action="{{ url_for('utils.filter_tasks') }}"
@@ -109,12 +141,17 @@
                 </button>
             </form>
 
+            <!--These filters do not hide tasks that do not meet the criteria-->
+            <!--They simply put those that meet the criteria at the forefront-->
+
         </nav>
     </div>
 </div>
 
 <br>
 
+<!--search bar class for searching for specific tasks-->
+<!--the div class forces the search bar to be centered and expand under the navbar-->
 <div class="container">
     <div class="col-md-6 mx-auto">
         <form 
@@ -122,6 +159,7 @@
             action="{{ url_for('views.home') }}"
             class="d-flex align-items-center">
 
+            <!--The search bar takes in all user values as 'search_query'-->
             <input
                 type="text"
                 name="search"
@@ -140,25 +178,36 @@
 
 <br>
 
+<!--The block being used here means everything within it is applied for all tasks-->
+<!--Every task gets these features and is represented in the same way-->
 {% for task in tasks %}
 
+    <!--The div classes contain the task details in a box-->
+    <!--This gives a clear division between each task-->
+    <!--The box has also been made large using 'col-md-10'-->
+    <!--SO the user is able to see most detail within the box-->
     <div class="container mt-3">
         <div class="text-center">
             <div class="col-md-10 mx-auto">
 
-            <div class="task-box border rounded p-3 mb-3">
+            <!--the div class creates an outline for the container and adds some padding-->
+            <div class="task-box border rounded p-3">
+                <!--In the box are all the task details the user needs to know about-->
                 <h3>{{ task.details }}</h3>
                 <div>Duration: {{ task.duration }} hours</div>
                 <div>Due Date: {{task.due_date }}</div>
                 <div>Created on: {{ task.creation_date.strftime('%Y-%m-%d') }}</div>
                 <div>Priority: {{ task.priority }}</div>
                 <div>Difficulty: {{ task.difficulty }}</div>
+                <!--The task notes are separated from the main attributes-->
+                <!--This is to denote it as a 'minor' attribute-->
                 <div class="separator"></div>
                 <div><strong>Notes: </strong>{{ task.notes or "" }}</div>
             </div>
 
             <br>
 
+            <!--button for completing a task-->
             <form 
                 method = 'POST' 
                 action="{{ url_for('utils.update_task') }}"
@@ -171,6 +220,8 @@
                     type="hidden"
                     name="action" 
                     value="complete">
+                <!--the completion button is a bit dynamic-->
+                <!--It changes its text whenever selected-->
                 <button 
                     type="submit" 
                     class="btn btn-outline-success">
@@ -182,6 +233,8 @@
                 </button>
             </form>
 
+            <!--the star button is a bit dynamic-->
+            <!--It changes its text whenever selected-->
             <form 
                 method = 'POST' 
                 action="{{ url_for('utils.update_task') }}"
@@ -194,6 +247,8 @@
                     type="hidden" 
                     name="action" 
                     value="star">
+                <!--the completion button is a bit dynamic-->
+                <!--It changes its text whenever selected-->
                 <button 
                     type="submit" 
                     class="btn btn-outline-warning">
@@ -205,6 +260,7 @@
                 </button>
             </form>
 
+            <!--button for editing a  ask-->
             <form 
                 method="GET"
                 action="{{ url_for('utils.edit_task', task_id=task.id) }}"
@@ -216,6 +272,7 @@
                 </button>
             </form>
             
+            <!--button for deleting a task-->
             <form 
                 method="POST"
                 action="{{ url_for('utils.delete_task') }}"
@@ -224,6 +281,8 @@
                     type="hidden" 
                     name="task_id" 
                     value="{{ task.id }}">
+                <!--To give the user time to think about their actions, the button is attached with a notification-->
+                <!--It's to allow the user a bit of time as to whether they want to permanently delete a task or not-->
                 <button 
                     type="submit" 
                     class="btn btn-outline-danger" 
@@ -236,28 +295,13 @@
     </div>
 </div>
 
-{% else %}
-
-<br>
-
-<div class="text-center">
-    <h3>No tasks could be found</h3>
-    <br>
-    <form 
-        method="POST" 
-        action="{{ url_for('utils.create_task') }}">
-        <button
-            type="submit"
-            class="btn btn-primary">
-            Add Tasks
-        </button>
-    </form>
-</div>
-
 {% endfor %}
 
 <br>
 
+<!--The button to sort tasks-->
+<!--Is separate from the task block as there only needs to be one button-->
+<!--has been made red (btn btn-danger) to draw user attention to it-->
 <div class="text-center">
     <form 
         method="POST" 
