@@ -4,24 +4,34 @@
  
 <style>
 
+    /*stylises the navbar so it avoids being altered by the theme change*/
+    /*achieved by giving the attribute the !important tag*/
+    /*border removed to give it a clean look*/
     #custom-navbar {
         background-color: transparent !important;
         border: none; 
     }
 
+    /*All buttons are made transparent*/
+    /*This is so they are able to lok loke the background color*/
+    /*This also means the text in the buttons is contrasting the background*/
     .theme-button-container {
         display: flex;
-        justify-content: center; /* Center the items horizontally */
-        gap: 20px; /* Space between the buttons */
+        justify-content: center;
+        gap: 20px;
     }
 
+    /*used for a hover affect on all buttons*/
+    /*slightly darkens the button to indicate the user is interacting with it*/
     .form-check {
-        margin: 0; /* Remove the default margin for alignment */
+        margin: 0;
     }
 
+    /*used for any active buttons*/
+    /*sarkens the button more than the hover affect to establish that a button is being used*/
     .form-check-label {
         display: inline-block;
-        padding-left: 5px; /* Space between radio button and label */
+        padding-left: 5px;
     }
 
 
@@ -29,8 +39,10 @@
 
 <br>
 
+<!--Bold title to attract user attention-->
 <h1 align="center"><b>Settings</b></h1>
 
+<!--Separator to distinguish the page contents from the page title-->
 <div class="separator"></div>
 
 <br>
@@ -39,8 +51,17 @@
 
 <br>
 
+<!--container class used to keep the input box in the margins-->
+<!--gives the input box consistency when adjusting for screen size-->
 <div class="container">
+    <!--used to align the box horizontally in the center-->
+    <!--the grid system is used to help with this-->
     <div class="row justify-content-center">
+        <!--Navbar class used to denote an item menu-->
+        <!--This navbar class in particular is for the filter options-->
+        <!--'navbar-expand' makes the navbar adjustable depending on screen size-->
+        <!--navbar-light makes the navbar contrast with the background so it's distinct -->
+        <!--bg-light applies a grey background to each selectable box within the navbar for styalization-->
         <nav 
             id="custom-navbar" 
             class="navbar navbar-expand navbar-light bg-light d-flex justify-content-center">
@@ -48,11 +69,14 @@
                 method="POST"
                 action="{{ url_for('views.settings') }}"
                 class="d-flex align-items-center gap-2">
+                <!--class='me-2' creates margins between each element to space them out more-->
 
+                <!--Input box for the due date weight-->
                 <div class="d-inline">
                     <label for="weight_due_date" class="me-2">
                         Due Date
                     </label>
+                    <!--The class is set to w-auto so it can adjust to the user's input values-->
                     <input
                         type="number"
                         id="weight_due_date"
@@ -65,6 +89,7 @@
                         class="form-control d-inline w-auto">
                 </div>
                     
+                <!--Input box for the durartion weight-->
                 <div class="d-inline">
                     <label for="weight_duration" class="me-2">
                         Duration
@@ -81,6 +106,7 @@
                         class="form-control d-inline w-auto">
                 </div>
 
+                <!--Input box for the priority weight-->
                 <div class="d-inline">
                     <label for="weight_priority" class="me-2">
                         Priority
@@ -97,6 +123,7 @@
                         class="form-control d-inline w-auto">
                 </div>
 
+                <!--Input box for the difficulty weight-->
                 <div class="d-inline">
                     <label for="weight_difficulty" class="me-2">
                         Difficulty
@@ -115,6 +142,8 @@
 
                 <br>
 
+                <!--Submit button that saves the user's weighs-->
+                <!--Can be disabled if the inputted weights do not equate to 1-->
                 <div class="d-inline ms-3">
                     <button
                         type="submit"
@@ -130,6 +159,7 @@
     </div>
 </div>
 
+<!--Error message that comes up if the user fails to properly adjust their weights-->
 <p 
     id="error-message" 
     style="color: red; display: none;"
@@ -139,12 +169,19 @@
 
 <br>
 
+<!--div class for saving the user's theme-->
 <div class="text-center">
     <form method="POST" action="{{ url_for('customization.save_theme') }}">
         <h3>Choose Theme</h3>
 
         <br>
 
+        <!--both themes are set to be radio buttons-->
+        <!--This makes it easier for the user to tell whether a button has been selected or not-->
+        <!--This also makes it easier for the website to tell which theme is active-->
+        <!--And therefore adjust accordingly-->
+
+        <!--Radio button for the app's light theme-->
         <div class="theme-button-container">
             <input 
                 type="radio" 
@@ -160,6 +197,7 @@
             </label>
         </div>
 
+        <!--Radio button for the app's dark theme-->
         <div class="theme-button-container">
             <input 
                 type="radio" 
@@ -187,13 +225,22 @@
 
 <br>
 
+<!--div class that allows the user to change their account details-->
+
+<!--container class used to keep the input box in the margins-->
+<!--gives the input box consistency when adjusting for screen size-->
 <div class="container">
+    <!--used to align the box horizontally in the center-->
+    <!--the grid system is used to help with this-->
     <div class="row justify-content-center">
+        <!--Automaticall adjusts the size of each input box so they're large for the viewer to see-->
         <div class="col-md-6">
             <form
                 action="{{ url_for('auth.update_account') }}"
                 method="POST">
 
+                <!--input box for person's username-->
+                <!--they are shown the previous value associated with that variable-->
                 <div class="mb-3">
                     <label for="username">
                         Username:
@@ -207,6 +254,8 @@
                         placeholder="Enter your username">
                 </div>
 
+                <!--input box for person's email-->
+                <!--they are shown the previous value associated with that variable-->
                 <div class="mb-3">
                     <label for="email">
                         Email:
@@ -220,6 +269,11 @@
                         placeholder="Enter your email">
                 </div>
 
+                <!--input box for person's password-->
+                <!--unlike the previous values, the password is kept hidden-->
+                <!--The password that the user can see that is hidden isn't the actual password-->
+                <!--It is the hash value-->
+                <!--When the user inputs their password, that password is immediately hashed and hidden-->
                 <div class="mb-3">
                     <label for="password">
                         Password:
@@ -235,14 +289,18 @@
 
                 <br>
 
+
                 <div class="text-center">
 
+                    <!--submission form for saving changes to their account-->
                     <button
                         type="submit"
                         class="btn btn-primary">
                         Save Changes
                     </button>
             
+                    <!--the user also has the option to delete their account-->
+                    <!--similar to the task deletion button, the user has to confirm that it wants to delete their account-->
                     <form
                         action="{{ url_for('auth.delete_account') }}"
                         method="POST"
@@ -265,7 +323,11 @@
 
 <script>
 
+    //Function that is used to validate the weights provided by the user in the form
     function validateWeights() {
+        //retrieves the value of each weight
+        //this will be used for calculating the weights
+        //as well as validating if they are in the correct form or not
         const weights = [
             parseFloat(document.getElementById("weight_due_date").value) || 0,
             parseFloat(document.getElementById("weight_duration").value) || 0,
@@ -273,20 +335,31 @@
             parseFloat(document.getElementById("weight_difficulty").value) || 0,
         ];
 
+        //all weights are added up to find the weight total
         const totalWeight = weights.reduce((a, b) => a + b, 0);
+        //all success and error messages are retrieved
+        //this is in preparation to tell the user if the sorting was a success/failure
         const errorMessage = document.getElementById("error-message");
         const saveButton = document.getElementById("save-button");
 
+        //conditional block for weights that exceed the value of 1
         if (totalWeight > 1) {
             errorMessage.style.display = "block";
             errorMessage.textContent = "Total weight cannot exceed 1.";
+            //this causes the save button to be turned off
+            //so the user cannot put forward their changes
             saveButton.disabled = true;
+        //conditional block for weights that are below the value of 1
         } else if (totalWeight < 1) {
             errorMessage.style.display = "block";
             errorMessage.textContent = "Total weight must equal 1.";
+            //this causes the save button to be turned off
+            //so the user cannot put forward their changes
             saveButton.disabled = true;
         } else {
+            //any error messages are hidden if the conditionals are met
             errorMessage.style.display = "none";
+            //if none of these conditionals are found to be true, the user can proceed
             saveButton.disabled = false;
         }
     }
