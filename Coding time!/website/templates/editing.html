@@ -30,7 +30,7 @@
                 action="{{ url_for('utils.edit_task', task_id=task.id) }}">
 
                 <div class="mb-3">
-                    <label for="details">Task Details:</label>
+                    <label for="details">Task Details</label>
                     <div class="input-group justify-content-center">
                     <input 
                         type="text" 
@@ -43,7 +43,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="duration">Duration (in hours):</label>
+                    <label for="duration">Duration (in minutes)</label>
                     <div class="input-group justify-content-center">
                     <input 
                         type="number" 
@@ -56,7 +56,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="due_date">Due Date:</label>
+                    <label for="due_date">Due Date</label>
                     <div class="input-group justify-content-center">
                     <input 
                         type="datetime-local" 
@@ -68,7 +68,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="priority">Priority:</label>
+                    <label for="priority">Priority</label>
                     <div class="input-group justify-content-center">
                         <select 
                             name="priority" 
@@ -98,7 +98,7 @@
                 <br>
              
                 <div class="mb-3">
-                    <label for="notes">Notes:</label>
+                    <label for="notes">Notes</label>
                     <div class="input-group justify-content-center">
                         <textarea 
                             id="notes" 
@@ -118,11 +118,13 @@
                         type="submit"
                         class="btn btn-primary">
                         Save Changes
+                        <i class="bi bi-pencil"></i>
                     </button>
                     <button 
                         onclick="history.back()"
                         class="btn btn-secondary">
                         Cancel
+                        <i class="bi bi-X"></i>
                     </button>
                 </div>
 
