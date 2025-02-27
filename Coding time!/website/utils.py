@@ -182,20 +182,25 @@ def filter_tasks():
     #the filter type is made a variable that equates to the user's choice
     filter_type = request.form.get('filter')
 
+    query = Task.query.filter_by(user_id=current_user.id)
+
     #the filter types are listed below 
     #they work by using a query function related to the task
     #the tasks are then sorted in descending order
     #
     if filter_type == 'creation_date':
-        tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.creation_date.desc()).all()
+        query = query.order_by(Task.creation_date.desc())
     elif filter_type == 'due_date':
-        tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.due_date.desc()).all()
+        today = date.today().isoformat()
+        query = query.filter(func.strftime('%Y-%m-%d', Task.due_date) == today) 
     elif filter_type == 'completed':
-        tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.completed.desc()).all()
+        query = query.filter(Task.completed == True)
     elif filter_type == 'starred':
-        tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.starred.desc()).all()
+        query = query.filter(Task.starred == True)
     else:
-        tasks = Task.query.filter_by(user_id=current_user.id).all()
+        query = query.filter_by(user_id=current_user.id)
+
+    tasks = query.all()
 
     return render_template('home.html', user=current_user, tasks=tasks)
 
