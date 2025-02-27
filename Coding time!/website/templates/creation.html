@@ -41,7 +41,7 @@
                 <!--form control is use to style the input boxes for each element-->
                 <!--it normally bevels the corners and makes them look sleeker-->
                 <div class="mb-3">
-                    <label for="details">Task Details:</label>
+                    <label for="details">Task Details</label>
                     <div class="input-group justify-content-center">
                         <input 
                             type="text" 
@@ -54,7 +54,7 @@
                 </div>
     
                 <div class="mb-3">
-                    <label for="details">Duration (in hours):</label>
+                    <label for="details">Duration (in minutes):</label>
                     <div class="input-group justify-content-center">
                         <input 
                             type="number" 
@@ -70,7 +70,7 @@
                 <!--this allows for some browser, like google, to bring up a calendar-->
                 <!--the user can then manually select the date of their choice-->
                 <div class="mb-3">
-                    <label for="details">Date of completion:</label>
+                    <label for="details">Date of completion</label>
                     <div class="input-group justify-content-center">
                         <input 
                             type="datetime-local" 
@@ -83,7 +83,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="priority">Priority (1,2 and 3 for high, medium, low):</label>
+                    <label for="priority">Priority (1,2 and 3 for high, medium, low)</label>
                     <div class="input-group justify-content-center">
                         <select 
                             name="priority" 
@@ -97,7 +97,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="difficulty">Difficulty (1,2 and 3 for easy, medium, hard):</label>
+                    <label for="difficulty">Difficulty (1,2 and 3 for easy, medium, hard)</label>
                     <div class="input-group justify-content-center">
                         <select 
                             name="difficulty" 
@@ -111,10 +111,10 @@
                 </div>
 
                 <!--'rows=3' limits the amount of text visible to the user-->
-                <!--exceeding 3 lines means the user has to scrool down-->
+                <!--exceeding 3 lines means the user has to scroll down-->
                 <!--this is done to limit the size of the input box for visual convenience-->
                 <div class="mb-3">
-                    <label for="details">Notes:</label>
+                    <label for="details">Notes</label>
                     <div class="input-group justify-content-center">
                         <textarea 
                             id="notes" 
@@ -131,6 +131,7 @@
                         type="submit"
                         class="btn btn-primary">
                         Create Task
+                        <i class="bi bi-pencil"></i>
                     </button>
                     <!--onlick="history.back" acts as a cancel button-->
                     <!--it essentially backtracks on the page the user was sent to-->
@@ -138,6 +139,7 @@
                         onclick="history.back()"
                         class="btn btn-secondary">
                         Cancel
+                        <i class="bi bi-X"></i>
                     </button>
                 </div>
 
