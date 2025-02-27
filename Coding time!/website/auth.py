@@ -13,6 +13,8 @@ from flask_login import login_user, login_required, logout_user, current_user
 #used to make a WSGI (Web Server Gateway Interface) to handle user security
 from werkzeug.security import check_password_hash, generate_password_hash
 
+import re
+
 #blueprint for the auth template
 auth = Blueprint('auth', __name__)
 
@@ -30,16 +32,25 @@ def login():
         session['login_attempts'] = 0
 
     if request.method == "POST":
-        email = request.form.get("email")
+        username_or_email = request.form.get("username_or_email")
         password = request.form.get("password")
 
         # Ensure all fields are completed
-        if not email or not password:
+        if not username_or_email or not password:
             flash('All fields are required', 'danger')
             return render_template('login.html')
 
         # Check if user exists
-        user = User.query.filter_by(email=email).first()
+        if "@" in username_or_email:
+            user = User.query.filter_by(email=username_or_email).first()
+            if not user:
+                flash('No user has been found with this email', 'danger')
+                return render_template('login.html')
+        else:
+            user = User.query.filter_by(username=username_or_email).first()
+            if not user:
+                flash('No account has been found with this username', 'danger')
+                return render_template('login.html')
 
         # If user exists and password matches
         if user and check_password_hash(user.password, password):
@@ -56,7 +67,7 @@ def login():
             flash('Too many failed attempts. Please reset your password.', 'danger')
             return redirect(url_for('auth.reset_password'))
 
-        flash('Invalid email or password', 'danger')
+        flash('Invalid username/email or password', 'danger')
         return render_template('login.html')
 
     return render_template('login.html')
@@ -77,7 +88,7 @@ def register():
     #function that prevents the user from registering
     #detects this by seeing if the user is authenticated
     if current_user.is_authenticated:
-        flash('You are already logged in', category='info')
+        flash('You are already logged in', 'info')
         return redirect(url_for('views.home'))
 
     #main registration function
@@ -89,14 +100,31 @@ def register():
 
         #function to make sure all fields are complete
         if not username or not email or not password:
-            flash('All fields are required', category='error')
+            flash('All fields are required', 'danger')
+            return redirect(url_for('auth.register'))
+
+        password_errors = []
+
+        if len(password) < 8:
+            password_errors.append("The password must be, at minimum, 8 characters long")
+
+        if not any(char.isdigit() for char in password):
+            password_errors.append("The password must contain at least one number or more")
+
+        special_characters =  r'!@#$%^&*(),.?":{}|<>'
+        if not any(char in special_characters for char in password):
+            password_errors.append("The password must contain at least one special character")
+
+        if password_errors:
+            for error in password_errors:
+                flash(error, 'danger')
             return redirect(url_for('auth.register'))
 
         #the user's details are checked to see if a duplicate email exists
         user = User.query.filter_by(email=email).first()
 
         if user:
-            flash('A user with this email already exists', category='error')
+            flash('A user with this email already exists', 'danger')
             return redirect(url_for('auth.login'))
         else:
             try:
@@ -112,100 +140,107 @@ def register():
                 db.session.commit()
                 #the application then remebers the user's login
                 login_user(new_user, remember=True)
-                flash('Registration successful')
+                flash('Registration successful', 'success')
                 return redirect(url_for('views.home'))
             #function for if any errors occur during the process
             except Exception as e:
                 db.session.rollback()
-                flash('An error occured while trying you register you, please try again')
+                flash('An error occured while trying you register you, please try again', 'danger')
                 print(f"Error: {e}")
 
-
     return render_template('register.html', user=current_user)
-
-#route for the user to reset their password
+    
 @auth.route('/reset-password', methods=['GET', 'POST'])
 def reset_password():
-
-    #this block occurs if the user selects to change their password
-    #can also occur if the user isn't able to login with their password 2x
     if request.method == 'POST':
-        #the email also needs to be inputted
-        #this is so the function can find the password associated with the email
-        #and therefore proceed to change it
-        email = request.form.get('email')
+        username_or_email = request.form.get("username_or_email")
         new_password = request.form.get('new_password')
         confirm_password = request.form.get('confirm_password')
 
-        #error message if the user does not complete all the required fields
-        if not email or not new_password or not confirm_password:
+        if not username_or_email or not new_password or not confirm_password:
             flash("All fields are required.", 'danger')
             return render_template('reset_password.html')
 
-        #error message if the provided email isn't findable
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            flash("No account found with this email.", 'danger')
-            return render_template('reset_password.html')
+        if "@" in username_or_email:
+            user = User.query.filter_by(email=username_or_email).first()
+            if not user:
+                flash('No user has been found with this email', 'danger')
+                return render_template('reset_password.html')
+        else:
+            user = User.query.filter_by(username=username_or_email).first()
+            if not user:
+                flash('No account has been found with this username', 'danger')
+                return render_template('reset_password.html')
 
-        #error message if the user's inputted passwords are not the same
         if new_password != confirm_password:
             flash("Passwords do not match.", 'danger')
             return render_template('reset_password.html')
+        
+        password_errors = []
 
-        #if the user passes all these checks, the new password is inserted into the user table
-        #the new password is hashed for security purposes'
-        #it is then added to the slot of the original password
+        if len(new_password) < 8:
+            password_errors.append("The password must be, at minimum, 8 characters long")
+
+        if not any(char.isdigit() for char in new_password):
+            password_errors.append("The password must contain at least one number or more")
+
+        special_characters =  r'!@#$%^&*(),.?":{}|<>'
+        if not any(char in special_characters for char in new_password):
+            password_errors.append("The password must contain at least one special character")
+
+        if password_errors:
+            for error in password_errors:
+                flash(error, 'danger')
+            return redirect(url_for('auth.reset_password'))       
+
         user.password = generate_password_hash(new_password)
         db.session.commit()
 
-        #the user is promptly informed of the successful operation
-        flash("Password reset successful. Please log in.", 'danger')
-        #they are redirected to the login page to try again
+        flash("Password reset successful. Please log in.", 'success')
         return redirect(url_for('auth.login'))
 
     return render_template('reset_password.html')
 
-#route for changing account details in the app
 @auth.route('/update-account', methods=['GET', 'POST'])
-#the function works only in the app
-#therefore the user has to be in-session
 @login_required
 def update_account():
 
-    #POST method used to send requests to the database
     if request.method == 'POST':
 
-        #the user is able to alter one of these attributes
-        #by default, these variables are set to what the user inputted when they registered
         new_username = request.form.get('username')
         new_email = request.form.get('email')
         new_password = request.form.get('password')
 
-        #the app checks the inputted email first to see if it is already in use by another user
         existing_user = User.query.filter_by(email=new_email).first()
-
-        #if the email is in use but does not match the current user, an error message pops up
         if existing_user and existing_user.id != current_user.id:
-            flash("An email like this already exists", category="error")
+            flash("You are already using this email", 'danger')
             return redirect(url_for('views.settings'))
 
-        #once this checked is passed, the new details are then inserted into their database columns
+        password_errors = []
+
+        if len(new_password) < 8:
+            password_errors.append("The password must be, at minimum, 8 characters long")
+
+        if not any(char.isdigit() for char in new_password):
+            password_errors.append("The password must contain at least one number or more")
+
+        special_characters =  r'!@#$%^&*(),.?":{}|<>'
+        if not any(char in special_characters for char in new_password):
+            password_errors.append("The password must contain at least one special character")
+
+        if password_errors:
+            for error in password_errors:
+                flash(error, 'danger')
+            return redirect(url_for('auth.register'))
+
         current_user.username = new_username
         current_user.email = new_email
-        current_user.password = new_password
-
-        #the new password is hashed after werkzeug security generates a new one
-        #this if for security purposes so other users cannot directly see the new password
         if new_password:
             from werkzeug.security import generate_password_hash
             current_user.password = generate_password_hash(new_password)
 
-        #the changes are then made to the database
         db.session.commit()
-
-        #the user is then returned to the home page
-        flash("Account updated successfully", category="success")
+        flash("Account updated successfully", 'success')
         return redirect(url_for('views.home'))
 
     return render_template('settings.html', user=current_user)
@@ -240,7 +275,6 @@ def delete_account():
             #they are subsequently logged out and sent to the login page
             flash('Your account and all associated data have been successfully deleted.', category='success')
             return redirect(url_for('auth.login'))
-
         
         else:
 
