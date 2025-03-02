@@ -26,35 +26,50 @@ def normalize_tasks(tasks):
 
     normalized_tasks = []
     for task in tasks:
-        #calculations to normalize each task
-        #the goal is to find suitable values for the amount of tasks the user has
-        #due_date uses reverse scaling
-        #this means that the task due the soonest has a value of 1
-        #tasks due later are represented by proportional values to ensure fair weightings
-        normalized_due = (1 - ((task.due_date - datetime.utcnow()).days / (max_due_date - datetime.utcnow()).days)) if task.due_date else 0
-        #for priority, duration and difficulty, the variable with the 'highest' gains a value of 1 for weighting
-        #the other variables get a value proportional to the max value to ensure proportional representation
-        normalized_duration = task.duration / max_duration
-        normalized_priority = int(task.priority) / max_priority
-        normalized_difficulty = int(task.difficulty) / max_difficulty
-
-        #the tasks are all appended to the original task
-        #so the task has its normalized attributes
-        #makes for easier mapping of values back to the respective task
-        normalized_tasks.append({
-            "task": task,
-            "due_date": normalized_due,
-            "duration": normalized_duration,
-            "priority": normalized_priority,
-            "difficulty": normalized_difficulty
-        })
+        if task.completed:
+            normalized_tasks.append({
+                "task": task,
+                "due_date": 0,
+                "duration": 0,
+                "priority": 0,
+                "original_priority": task.priority,
+                "original_difficulty": task.difficulty
+            })
+        else:
+            #calculations to normalize each task
+            #the goal is to find suitable values for the amount of tasks the user has
+            #due_date uses reverse scaling
+            #this means that the task due the soonest has a value of 1
+            #tasks due later are represented by proportional values to ensure fair weightings
+            normalized_due = (1 - ((task.due_date - datetime.utcnow()).days / (max_due_date - datetime.utcnow()).days)) if task.due_date else 0
+            #for priority, duration and difficulty, the variable with the 'highest' gains a value of 1 for weighting
+            #the other variables get a value proportional to the max value to ensure proportional representation
+            normalized_duration = task.duration / max_duration
+            normalized_priority = int(task.priority) / max_priority
+            normalized_difficulty = int(task.difficulty) / max_difficulty
+    
+            #the tasks are all appended to the original task
+            #so the task has its normalized attributes
+            #makes for easier mapping of values back to the respective task
+            normalized_tasks.append({
+                "task": task,
+                "due_date": normalized_due,
+                "duration": normalized_duration,
+                "priority": normalized_priority,
+                "difficulty": normalized_difficulty,
+                "original_priority": task.priority,
+                "original_difficulty": task.difficulty
+            })
 
     return normalized_tasks
 
 #calculate_task_scores assigns a proportional value to each of the task attributes
 #this is done to ensure everything is ordered in accordance with user preferences
-#this also optimises the sorting variables more
+#this also optimizes the sorting variables more
 def calculate_task_scores(tasks, preferences):
+
+    priority_map = {1: "High", 2: "Medium", 3: "Low"}
+    difficulty_map = {1: "Easy", 2: "Medium", 3: "Hard"}
     normalized_tasks = normalize_tasks(tasks)
 
     #the weights are imported from the database
@@ -72,7 +87,7 @@ def calculate_task_scores(tasks, preferences):
     scored_tasks = []
     for task_data in normalized_tasks:
         task = task_data["task"]
-        score = (
+        score = 0 if task.completed else (
             #to calculate a total score, the data for a task's attribute is multiplied by the weight data
             #the higher overall score a task gets, the more 'important' it is to the user
             #hence, that task has a higher chance of getting sorted first
@@ -83,13 +98,27 @@ def calculate_task_scores(tasks, preferences):
         )
         #the totals for each task are appended to the database
         #they're added in separate tuples
-        scored_tasks.append((task, score))
+        scored_tasks.append((
+            task,
+            score,
+            task_data["original_priority"],
+            task_data["original_difficulty"]
+        ))
 
     #the function then looks inside each tuple for the second element in each tuple (the score)
     #this is done using the Lambda function
     #the reverse=True variable is done to sort the tasks in descending order
     #this is so the most immediate task is shown first
     scored_tasks.sort(key=lambda x: x[1], reverse=True)
+
+    sorted_tasks = []
+    for task, score, original_priority, original_difficulty in scored_tasks:
+        task.priority = original_priority
+        task.difficulty = original_difficulty
+        task.priority_str = priority_map.get(original_difficulty, "Low")
+        task.difficulty_str = difficulty_map.get(original_difficulty, "Easy")
+        sorted_tasks.append(task)
+    
     return [task[0] for task in scored_tasks]
 
 #adjust_weights gives the function some dynamcy when used
@@ -149,5 +178,13 @@ def sort_tasks():
     #duration is then made to appear in ascending order if used
     #so the quickest task appears first
     sorted_tasks = sorted(tasks_query, key=lambda task: task.duration)
+
+    priority_map = {1: "High", 2: "Medium", 3: "Low"}
+    difficulty_map = {1: "Easy", 2: "Medium", 3: "Hard"}
+
+    for task in sorted_tasks:
+        task.priority_str = priority_map.get(task.priority, "Low")
+        task.difficulty_str = difficulty_map.get(task.difficulty, "Easy")
+    flash("Your tasks have been sorted!", 'success')
 
     return render_template('home.html', user=current_user, tasks=sorted_tasks)
