@@ -100,7 +100,7 @@ def register():
 
         #function to make sure all fields are complete
         if not username or not email or not password:
-            flash('All fields are required', 'danger')
+            flash('All fields are required, 'danger')
             return redirect(url_for('auth.register'))
 
         password_errors = []
@@ -124,7 +124,7 @@ def register():
         user = User.query.filter_by(email=email).first()
 
         if user:
-            flash('A user with this email already exists', 'danger')
+            flash('A user with this email already exists, 'danger')
             return redirect(url_for('auth.login'))
         else:
             try:
@@ -138,14 +138,14 @@ def register():
                 #the user is then added to the database
                 db.session.add(new_user)
                 db.session.commit()
-                #the application then remebers the user's login
+                #the application then remembers the user's login
                 login_user(new_user, remember=True)
                 flash('Registration successful', 'success')
                 return redirect(url_for('views.home'))
             #function for if any errors occur during the process
             except Exception as e:
                 db.session.rollback()
-                flash('An error occured while trying you register you, please try again', 'danger')
+                flash('An error occurred while trying you register you, please try again', 'danger')
                 print(f"Error: {e}")
 
     return render_template('register.html', user=current_user)
@@ -280,7 +280,7 @@ def delete_account():
 
             #branch for if the user could not be found
             #an error message is sent to say the account couldn't be located
-            flash('Account not found.', category='error')
+            flash('Account not found.', 'danger')
             return redirect(url_for('views.settings'))
 
     return redirect(url_for('views.settings'))
