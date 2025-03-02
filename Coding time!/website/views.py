@@ -38,10 +38,20 @@ def home():
         #displays all the user's tasks regardless of the search function
         tasks= Task.query.filter_by(user_id=current_user.id).all()
 
+    user_preferences = Preferences.query.filter_by(id=current_user.id).first()
+    if user_preferences:
+        tasks = calculate_task_scores(tasks, user_preferences)
+
+    priority_map = {1: "High", 2: "Medium", 3: "Low"}
+    difficulty_map = {1: "Easy", 2: "Medium", 3: "Hard"}
+
+    for task in tasks:
+        task.priority_str = priority_map.get(task.priority, "Low")
+        task.difficulty_str = difficulty_map.get(task.difficulty, "Easy")
+    
     #the filtered function for tasks_due_today is returned to the user
     today = datetime.utcnow().date()
     tasks_due_today = [task for task in tasks if task.due_date and task.due_date.date() == today]
-
     #the filtered function for completed_tasks is returned
     completed_tasks = [task for task in tasks if task.completed]
     #the filtered function for starred_tasks is returned
@@ -75,7 +85,6 @@ def settings():
 
     if request.method == 'POST':
         try:
-
             weight_due_date = float(request.form.get('weight_due_date', 0))
             weight_duration = float(request.form.get('weight_duration', 0))
             weight_priority = float(request.form.get('weight_priority', 0))
@@ -97,5 +106,16 @@ def settings():
         except ValueError:
             flash("Invalid input. Please enter numeric values.", category="error")
             return redirect(url_for('views.settings'))
+
+        if not user_preferences:
+            user_preferences = Preferences(
+                user_id=current_user.id,
+                weight_due_date=0.25,
+                weight_duration=0.25,
+                weight_priority=0.25,
+                weight_difficulty=0.25
+            )
+        db.session.add(user_preferences)
+        db.session.commit()
 
     return render_template('settings.html', user=current_user, user_preferences=user_preferences)
