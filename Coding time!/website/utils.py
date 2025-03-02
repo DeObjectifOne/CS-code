@@ -20,17 +20,15 @@ from flask_login import login_required, current_user
 
 #datetime imported for user interactions with datetime variables
 #these are the due_date and creation_date variables
-from datetime import datetime
+from datetime import datetime, date
+
+from sqlalchemy.sql import text
+from sqlalchemy import cast, Date, func
 
 #blueprint for the util(itie)s template
 #can be used for importing purposes
 utils = Blueprint('utils', __name__)
 
-#function that allows the user to make a new task
-@utils.route('/creation', methods=['GET', 'POST'])
-@login_required
-def create_task():
-    
 #function that allows the user to make a new task
 @utils.route('/creation', methods=['GET', 'POST'])
 @login_required
