@@ -149,96 +149,126 @@ def register():
                 print(f"Error: {e}")
 
     return render_template('register.html', user=current_user)
-    
+
+#function to reset the user's password
 @auth.route('/reset-password', methods=['GET', 'POST'])
 def reset_password():
+
+    #user enters their email/username so the new password can be traced back to them
+    #new password entered and re-entered as is standard practice on other websites
     if request.method == 'POST':
         username_or_email = request.form.get("username_or_email")
         new_password = request.form.get('new_password')
         confirm_password = request.form.get('confirm_password')
 
+        #validation check to see if all the entry fields have been completed
         if not username_or_email or not new_password or not confirm_password:
             flash("All fields are required.", 'danger')
             return render_template('reset_password.html')
-
+            
+        #validation check to see if a user exists with the specified email
         if "@" in username_or_email:
             user = User.query.filter_by(email=username_or_email).first()
             if not user:
                 flash('No user has been found with this email', 'danger')
                 return render_template('reset_password.html')
         else:
+            #validation check to see if the user exist with the specified username
             user = User.query.filter_by(username=username_or_email).first()
             if not user:
                 flash('No account has been found with this username', 'danger')
                 return render_template('reset_password.html')
 
+        #check to make sure that the re-entered password equals their original password
         if new_password != confirm_password:
             flash("Passwords do not match.", 'danger')
             return render_template('reset_password.html')
-        
+
+        #password dictionary to hold password error
         password_errors = []
 
+        #checks to see if the password does not meet the character limit
         if len(new_password) < 8:
             password_errors.append("The password must be, at minimum, 8 characters long")
 
+        #checks to see if the password contains a number
         if not any(char.isdigit() for char in new_password):
             password_errors.append("The password must contain at least one number or more")
 
+        #checks to see if the new password contains special characters
         special_characters =  r'!@#$%^&*(),.?":{}|<>'
         if not any(char in special_characters for char in new_password):
             password_errors.append("The password must contain at least one special character")
 
+        #if an error is detected, it is added to the established dictionary
+        #the user is then redirected
         if password_errors:
             for error in password_errors:
                 flash(error, 'danger')
             return redirect(url_for('auth.reset_password'))       
 
+        #the newly validated password receives a hash function
         user.password = generate_password_hash(new_password)
         db.session.commit()
 
+        #message sent to say the function was successful
         flash("Password reset successful. Please log in.", 'success')
         return redirect(url_for('auth.login'))
 
     return render_template('reset_password.html')
 
+#function for the user to edit and then update their account
 @auth.route('/update-account', methods=['GET', 'POST'])
 @login_required
 def update_account():
 
+    #user details retrieved
+    #but are kept as a 'new' variable
     if request.method == 'POST':
-
         new_username = request.form.get('username')
         new_email = request.form.get('email')
         new_password = request.form.get('password')
 
+        #the user's email is filtered thorugh the existing user list
+        #prevents an email from being reused again
         existing_user = User.query.filter_by(email=new_email).first()
         if existing_user and existing_user.id != current_user.id:
             flash("You are already using this email", 'danger')
             return redirect(url_for('views.settings'))
 
+        #password dictionary to hold password error
         password_errors = []
 
+        #checks to see if the password does not meet the character limit
         if len(new_password) < 8:
             password_errors.append("The password must be, at minimum, 8 characters long")
 
+        #checks to see if the password contains a number
         if not any(char.isdigit() for char in new_password):
             password_errors.append("The password must contain at least one number or more")
 
+        #checks to see if the password contains a special character
         special_characters =  r'!@#$%^&*(),.?":{}|<>'
         if not any(char in special_characters for char in new_password):
             password_errors.append("The password must contain at least one special character")
 
+        #if an error is detected, it is added to the established dictionary
+        #the user is then redirected
         if password_errors:
             for error in password_errors:
                 flash(error, 'danger')
             return redirect(url_for('auth.register'))
 
+        #the user's current username and email are overrided to feature the new username/email
         current_user.username = new_username
         current_user.email = new_email
+
+        #the new password is hashed
         if new_password:
             from werkzeug.security import generate_password_hash
             current_user.password = generate_password_hash(new_password)
 
+        #new variables pushed to the database
         db.session.commit()
         flash("Account updated successfully", 'success')
         return redirect(url_for('views.home'))
