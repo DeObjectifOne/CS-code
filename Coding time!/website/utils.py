@@ -4,30 +4,25 @@
 #flash imported for user notifications incase there is an error/success
 #redirect import used to send user to webpages upon user interaction
 #url_for imported for link referencing in python functions
-from flask import Blueprint, render_template, request, flash, redirect, url_for
-
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 #database imported for user-database interaction
 from . import db
-
 #User and Task table imported for user-table interaction
 from .models import User, Task
-
 #login_required imported to restrict usage of this function
 #this means it cannot be used unless the user is logged in
 #current_user imported for session purposes
 #allows flask to detect certain users whenever they're using the website
 from flask_login import login_required, current_user
-
 #datetime imported for user interactions with datetime variables
 #these are the due_date and creation_date variables
 from datetime import datetime, date
-
-from sqlalchemy.sql import text
-from sqlalchemy import cast, Date, func
-
 #blueprint for the util(itie)s template
 #can be used for importing purposes
 utils = Blueprint('utils', __name__)
+
+from sqlalchemy.sql import text
+from sqlalchemy import cast, Date, func
 
 #function that allows the user to make a new task
 @utils.route('/creation', methods=['GET', 'POST'])
@@ -202,20 +197,73 @@ def filter_tasks():
 
     return render_template('home.html', user=current_user, tasks=tasks)
 
+#update task status function
 @utils.route('update-task', methods=['POST'])
 def update_task():
+
+    #the last action performed on a task is taken into account
     task_id = request.form.get('task_id')
     action = request.form.get('action')
     task = Task.query.get(task_id)
 
+    #if the action is complete, the variable is set to true
     if task and task.user_id == current_user.id:
         if action == "complete":
             task.completed = not task.completed
+        #if the action is star, the variable is set to true
         elif action == "star":
             task.starred = not task.starred
         db.session.commit()
+        #message sent to notify the user that it worked
         flash(f"Task '{task.details}' updated successfully", category="success")
     else:
-        flash("Task not found or unable to be updated", category='error')
+        #message sent incase of failure to update task
+        flash("Task not found or unable to be updated, try again!", category='error')
 
     return redirect(url_for('views.home'))
+
+@utils.route('/reposition-task', methods=['POST'])
+def reposition_task(user_id, task_id, direction):
+
+    #user's current tasks retrieved
+    task = Task.query.filter_by(id=task_id, user_id=user_id).first()
+
+    #if there are no tasks to move, the function outputs nothing
+    if not task:
+        return None
+
+    #task list retrieved with the positions of each task having been established
+    Tlist = Task.query.filter_by(user_id=user_id).order_by(Task.position).all()
+
+    # Find the current task's position in the list
+    index = Tlist.index(task)
+
+    if direction == 'up' and index > 0:
+        # Swap the task with the one above
+        Tlist[index], Tlist[index - 1] = Tlist[index - 1], Tlist[index]
+    elif direction == 'down' and index < len(Tlist) - 1:
+        # Swap the task with the one below
+        Tlist[index], Tlist[index + 1] = Tlist[index + 1], Tlist[index]
+
+    # Update the position of each task
+    for idx, t in enumerate(Tlist):
+        t.position = idx
+    db.session.commit()
+
+    return task  # Return the task that was moved
+
+#function to record the new task order in the database
+@utils.route("/update-order", methods=["POST"])
+def update_order():
+
+    #retrieves all recent task positions
+    data = request.json
+    #all new position values are imported and retaken
+    for item in data:
+        task = Task.query.get(item["id"])
+        if task:
+            task.position = item["position"]
+    db.session.commit()
+
+    #message returned to tell the user the task order has been updatedd
+    return jsonify({"message": "Your task order has updated!"}), 200
