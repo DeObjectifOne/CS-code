@@ -1,10 +1,10 @@
-{% extends "layout.html" %} {% block title %}Register{% endblock %}
+{% extends "layout.html" %}{% block title %}Settings{% endblock %}
 
 {% block content %}
 
 <br>
 
-<h1 align="center"><b>Register</b></h1>
+<h1>Reset Password</h1>
 
 <br>
 
@@ -19,7 +19,7 @@
         <div class="col-md-6">
             <form 
                 method="POST" 
-                action="{{ url_for('auth.register') }}">
+                action="{{ url_for('auth.reset_password') }}">
                 <!--Each input boxes receives the class mb-3-->
                 <!--'mb-3' defines the amount of spacing inbetween elements-->
                 <!--the grid system is used, so there are 3 grid spaces inbetween each element-->
@@ -29,30 +29,27 @@
                     <input 
                         type="text" 
                         class="form-control" 
-                        name="username"
-                        id="username" 
-                        placeholder="Enter your username"
-                        required>
-                </div>
-
-                <div class="mb-3">
-                    <input 
-                        type="email" 
-                        class="form-control" 
-                        name="email"
-                        id="email" 
-                        placeholder="Enter your email"
-                        required>
+                        name="username_or_email"
+                        id="username_or_email" 
+                        placeholder="Enter your username or email">
                 </div>
 
                 <div class="mb-3">
                     <input 
                         type="password" 
                         class="form-control" 
-                        name="password"
-                        id="password" 
-                        placeholder="Enter your password"
-                        required>
+                        name="new_password"
+                        id="new_password" 
+                        placeholder="Enter your new password">
+                </div>
+
+                <div class="mb-3">
+                    <input 
+                        type="password" 
+                        class="form-control" 
+                        name="confirm_password"
+                        id="confirm_password" 
+                        placeholder="Enter your new password again">
                 </div>
 
                 <!--The additional usage of align center is done for the vertical axis-->
@@ -63,14 +60,14 @@
                     <!--is also used to space them out with the margins-->
                     <button 
                         type="submit" 
-                        class="btn btn-primary">
-                        Register
+                        class="btn btn-primary mx=3">
+                        Change details
                     </button>
-                    <a 
-                        href="{{ url_for('auth.reset_password') }}" 
-                        class="btn btn-secondary mx-3">
-                        Reset Password
-                    </a>
+                    <button 
+                        onclick="history.back()" 
+                        class="btn btn-primary mx-3">
+                        Cancel
+                    </button>
                 </div>
 
             </form>
