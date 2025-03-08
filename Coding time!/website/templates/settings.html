@@ -51,6 +51,10 @@
 
 <br>
 
+<p align="center">Hello {{ user.username }}! here you can modify the weights of your tasks to prioritize attributes over others</p>
+
+<br>
+
 <!--container class used to keep the input box in the margins-->
 <!--gives the input box consistency when adjusting for screen size-->
 <div class="container">
@@ -151,6 +155,7 @@
                         class="btn btn-primary"
                         disabled>
                         Save Preferences
+                        <i class="bi bi-check"></i>
                     </button>
                 </div>
 
@@ -166,6 +171,10 @@
     class="text-center">
     The weightings must equal 1
 </p>
+
+<br>
+
+<p align="center">You can also change the website's theme!</p>
 
 <br>
 
@@ -216,107 +225,6 @@
         <br>
 
     </form>
-</div>
-
-
-<br>
-
-<h3 align=center>Change account details</h3>
-
-<br>
-
-<!--div class that allows the user to change their account details-->
-
-<!--container class used to keep the input box in the margins-->
-<!--gives the input box consistency when adjusting for screen size-->
-<div class="container">
-    <!--used to align the box horizontally in the center-->
-    <!--the grid system is used to help with this-->
-    <div class="row justify-content-center">
-        <!--Automaticall adjusts the size of each input box so they're large for the viewer to see-->
-        <div class="col-md-6">
-            <form
-                action="{{ url_for('auth.update_account') }}"
-                method="POST">
-
-                <!--input box for person's username-->
-                <!--they are shown the previous value associated with that variable-->
-                <div class="mb-3">
-                    <label for="username">
-                        Username:
-                    </label>
-                    <input 
-                        type="username" 
-                        name="username"
-                        id="username" 
-                        class="form-control"
-                        value="{{ current_user.username }}"
-                        placeholder="Enter your username">
-                </div>
-
-                <!--input box for person's email-->
-                <!--they are shown the previous value associated with that variable-->
-                <div class="mb-3">
-                    <label for="email">
-                        Email:
-                    </label>
-                    <input 
-                        type="email" 
-                        name="email"
-                        id="email" 
-                        class="form-control"
-                        value="{{ current_user.email }}"
-                        placeholder="Enter your email">
-                </div>
-
-                <!--input box for person's password-->
-                <!--unlike the previous values, the password is kept hidden-->
-                <!--The password that the user can see that is hidden isn't the actual password-->
-                <!--It is the hash value-->
-                <!--When the user inputs their password, that password is immediately hashed and hidden-->
-                <div class="mb-3">
-                    <label for="password">
-                        Password:
-                    </label>
-                    <input 
-                        type="password" 
-                        name="password"
-                        id="password" 
-                        class="form-control"
-                        value="{{ current_user.password }}"
-                        placeholder="Enter your password">
-                </div>
-
-                <br>
-
-
-                <div class="text-center">
-
-                    <!--submission form for saving changes to their account-->
-                    <button
-                        type="submit"
-                        class="btn btn-primary">
-                        Save Changes
-                    </button>
-            
-                    <!--the user also has the option to delete their account-->
-                    <!--similar to the task deletion button, the user has to confirm that it wants to delete their account-->
-                    <form
-                        action="{{ url_for('auth.delete_account') }}"
-                        method="POST"
-                        onsubmit="return confirm('Are you sure you want to delete your account?, this action cannot be undone')">
-                        <button
-                            type="submit"
-                            class="btn btn-danger">
-                            Delete Account
-                        </button>
-                    </form>
-            
-                </div>
-
-            </form>
-        </div>
-    </div>
 </div>
 
 <br>
