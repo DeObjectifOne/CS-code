@@ -6,6 +6,10 @@
 
 <style>
 
+    /*The CSS tags are used to styalise the page*/
+    /*In this instance, its to give a consistant composition*/
+    /*To all elements that use the attribute 'form-control'*/
+    /*Makes the text look neatly aligned and comfortable*/
     textarea.form-control {
         padding: 5px;     
         text-align: left;     
@@ -22,13 +26,22 @@
  
 <br>
 
+<!--container class used to keep the input box in the margins-->
+<!--gives the input box consistency when adjusting for screen size-->
 <div class="container">
+    <!--used to align the box horizontally in the center-->
+    <!--the grid system is used to help with this-->
     <div class="row justify-content-center">
         <div class="col-md-6">
             <form 
                 method="POST" 
                 action="{{ url_for('utils.edit_task', task_id=task.id) }}">
 
+                <!--Each input boxes receives the class mb-3-->
+                <!--'mb-3' defines the amount of spacing inbetween elements-->
+                <!--the grid system is used, so there are 3 grid spaces inbetween each element-->
+                <!--form control is use to style the input boxes for each element-->
+                <!--it normally bevels the corners and makes them look sleeker-->
                 <div class="mb-3">
                     <label for="details">Task Details</label>
                     <div class="input-group justify-content-center">
@@ -74,9 +87,9 @@
                             name="priority" 
                             id="priority"
                             class="form-control">
-                            <option value="3">Low</option>
-                            <option value="2">Medium</option>
-                            <option value="1">High</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
                         </select>
                     </div>
                 </div>
@@ -88,15 +101,15 @@
                             name="difficulty" 
                             id="difficulty"
                             class="form-control">
-                            <option value="1">Easy</option>
-                            <option value="2">Medium</option>
-                            <option value="3">Hard</option>
+                            <option value="Easy">Easy</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Hard">Hard</option>
                         </select>
                     </div>
                 </div>
 
                 <br>
-             
+
                 <div class="mb-3">
                     <label for="notes">Notes</label>
                     <div class="input-group justify-content-center">
