@@ -2,21 +2,28 @@
 
 {% block content %}
 
-<br>
-
-<h1 align="center"><b>Register</b></h1>
+<style>
+    .navbar {
+        display: none;
+    }
+</style>
 
 <br>
 
 <!--container class used to keep the input box in the margins-->
 <!--gives the input box consistency when adjusting for screen size-->
-<div class="container">
+<div class="container d-flex justify-content-center align-items-center vh-100">
     <!--used to align the box horizontally in the center-->
     <!--the grid system is used to help with this-->
-    <div class="row justify-content-center">
+    <div class="row justify-content-center w-100">
         <!--'col-md-6' defines how large an input box will be-->
         <!--The max is 12, so the box takes 6 out of 12 boxes in the grid system-->
         <div class="col-md-6">
+
+            <h1 align="center"><b>Register</b></h1>
+
+            <br>
+
             <form 
                 method="POST" 
                 action="{{ url_for('auth.register') }}">
@@ -66,11 +73,13 @@
                         class="btn btn-primary">
                         Register
                     </button>
-                    <a 
-                        href="{{ url_for('auth.reset_password') }}" 
-                        class="btn btn-secondary mx-3">
-                        Reset Password
-                    </a>
+                </div>
+
+                <br><br>
+
+                <div align="center">
+                    <p style="display: inline;">Already have an account? log in</p>
+                    <a href="{{ url_for('auth.login')  }}"> Here!</a>
                 </div>
 
             </form>
