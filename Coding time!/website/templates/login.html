@@ -2,21 +2,28 @@
 
 {% block content %}
 
-<br>
-
-<h1 align="center"><b>Login</b></h1><!--Bold title to draw user attention-->
+<style>
+    .navbar {
+        display: none;
+    }
+</style>
 
 <br>
 
 <!--container class used to keep the input box in the margins-->
 <!--gives the input box consistency when adjusting for screen size-->
-<div class="container">
+<div class="container d-flex justify-content-center align-items-center vh-100">
     <!--used to align the box horizontally in the center-->
     <!--the grid system is used to help with this-->
-    <div class="row justify-content-center">
+    <div class="row justify-content-center w-100">
         <!--'col-md-6' defines how large an input box will be-->
         <!--The max is 12, so the box takes 6 out of 12 boxes in the grid system-->
         <div class="col-md-6">
+
+            <h1 align="center"><b>Login</b></h1><!--Bold title to draw user attention-->
+
+            <br>
+
             <form 
                 method="POST" 
                 action="{{ url_for('auth.login') }}">
@@ -27,11 +34,12 @@
                 <!--it normally bevels the corners and makes them look sleeker-->
                 <div class="mb-3">
                     <input 
-                        type="email" 
+                        type="text" 
                         class="form-control" 
-                        name="email"
-                        id="email" 
-                        placeholder="Enter your email">
+                        name="username_or_email"
+                        id="username_or_email" 
+                        placeholder="Enter your username or email"
+                        required>
                 </div>
 
                 <div class="mb-3">
@@ -40,7 +48,8 @@
                         class="form-control" 
                         name="password"
                         id="password" 
-                        placeholder="Enter your password">
+                        placeholder="Enter your password"
+                        required>
                 </div>
 
                 <!--The additional usage of align center is done for the vertical axis-->
@@ -56,9 +65,16 @@
                     </button>
                     <a 
                         href="{{ url_for('auth.reset_password') }}" 
-                        class="btn btn-secondary mx-3">
+                        class="btn btn-secondary">
                         Reset Password
                     </a>
+                </div>
+
+                <br><br>
+
+                <div align="center">
+                    <p style="display: inline;">Don't have an account? register</p>
+                    <a href="{{ url_for('auth.register')  }}"> Here!</a>
                 </div>
 
             </form>
