@@ -39,7 +39,7 @@
 
 </style>
 
-<br>
+<br><br>
 
 <!--Titled made bold to attract the user's attention-->
 <h1 align="center"><b>Tidily Day Tracker</b></h1>
@@ -209,20 +209,19 @@
             <div class="col-md-10 mx-auto">
                 <div class="task">
 
-                    <!--the div class creates an outline for the container and adds some padding-->
-                    <div class="task-box border rounded p-3">
-                        <!--In the box are all the task details the user needs to know about-->
-                        <h3>{{ task.details }}</h3>
-                        <div>Duration: {{ task.duration }} hours</div>
-                        <div>Due Date: {{task.due_date }}</div>
-                        <div>Created on: {{ task.creation_date.strftime('%Y-%m-%d') }}</div>
-                        <div>Priority: {{ task.priority_str }}</div>
-                        <div>Difficulty: {{ task.difficulty_str }}</div>
-                        <!--The task notes are separated from the main attributes-->
-                        <!--This is to denote it as a 'minor' attribute-->
-                        <div class="separator"></div>
-                        <div><strong>Notes: </strong>{{ task.notes or "" }}</div>
-                    </div>
+                        <div class="task-box border rounded p-3">
+                            <!--In the box are all the task details the user needs to know about-->
+                            <h3>{{ task.details }}</h3>
+                            <br>
+                            <div class="text-left">Duration: {{ task.duration }} hours</div>
+                            <div class="text-left">Due Date: {{task.due_date }}</div>
+                            <div class="text-left">Created on: {{ task.creation_date.strftime('%Y-%m-%d') }}</div>
+                            <div class="text-left">Priority: {{ task.priority_str }}</div>
+                            <div class="text-left">Difficulty: {{ task.difficulty_str }}</div>
+                            <br>
+                            <div class="separator"></div>
+                            <div><strong>Notes: </strong>{{ task.notes or "" }}</div>
+                        </div>
 
                     <br>
 
