@@ -122,23 +122,30 @@
                         <i class="bi bi-check"></i>
                     </button>
             
-                    <!--the user also has the option to delete their account-->
-                    <!--similar to the task deletion button, the user has to confirm that it wants to delete their account-->
-                    <form
-                        action="{{ url_for('auth.delete_account') }}"
-                        method="POST"
-                        onsubmit="return confirm('Are you sure you want to delete your account?, this action cannot be undone')">
-                        <button
-                            type="submit"
-                            class="btn btn-danger"
-                            onclick="return confirm('Are you sure you want to delete your account?')">
-                            Delete Account
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
-            
                 </div>
 
+            </form>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<!--the user also has the option to delete their account-->
+<!--similar to the task deletion button, the user has to confirm that it wants to delete their account-->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <form 
+                action="{{ url_for('auth.delete_account') }}" 
+                method="POST" 
+                onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">
+                <button 
+                    type="submit" 
+                    class="btn btn-danger">
+                    Delete Account
+                    <i class="bi bi-trash"></i>
+                </button>
             </form>
         </div>
     </div>
