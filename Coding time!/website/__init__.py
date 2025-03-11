@@ -1,17 +1,13 @@
 #used to import and support many web functions
-from flask import Flask
-
+from flask import Flask, g, session, request, redirect, url_for
 #used for databases and CRUD operations
 from flask_sqlalchemy import SQLAlchemy
-
 #used to create a secret key
 import secrets
-
 #used to create direct/absolute paths to routes
 import os
-
 #used for handling user login queries and requests
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 
 #imports and creates the database in models.py
 db = SQLAlchemy()
@@ -19,26 +15,19 @@ DB_NAME = "database.db"
 
 #app function that instantiates all connected roots
 def create_app():
-
-    #changes the function name
-    #makes it shorter to type out
+    
     app = Flask(__name__)
-    #used for website encryption
-    #added layer of security
     app.secret_key = secrets.token_hex(24)
-    #the database is set to run once the website runs
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     db.init_app(app)
 
     # Import and register blueprints
-    #this is so they're run when the website runs
     from .auth import auth
     from .views import views
     from .utils import utils
     from .sort import sort
     from .customization import customization
 
-    #makes the url link for these blueprints valid
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(utils, url_prefix='/')
@@ -47,7 +36,7 @@ def create_app():
 
     #used to redirect users to the necessary pages upon booting up the website
     login_manager = LoginManager()
-    login_manager.login_view = 'views.login'
+    login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
 
     # Import models so tables can be created
@@ -56,16 +45,29 @@ def create_app():
         db.create_all()
 
     #used to return the user's details by using their id
-    #this also works for linking the user to their tasks
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(int(id))
-
-    #used to insert any of the dictionaries the user requires
+    
     @app.context_processor
     def inject_user():
-        return dict(user=current_user)
+        return {'user': current_user}
+    
+    @app.context_processor
+    def inject_current_page():
+        
+        page_names = {
+            'views.home': 'Home',
+            'utils.create_task': 'Add Task',
+            'views.settings': 'Settings',
+            'auth.logout': 'Logout',
+            'auth.login': 'Login',
+            'auth.register': 'Register',
+        }
 
+        current_page = page_names.get(request.endpoint, 'Unknown Page')
+        return {'current_page': current_page}
+    
     @app.before_request
     def redirect_if_not_logged_in():
         if not current_user.is_authenticated:
@@ -79,13 +81,13 @@ def create_app():
             g.theme = preferences.theme if preferences and preferences.theme else 'light'
         else:
             g.theme = session.get('theme', 'light') 
-    
-    #used to make sure that any datetime objects are formatted correctly
-    #this allows for better display and editing of the task
+
+    #makes it so the due_date variable from models.py is modelled uniformally
+    #as a datetime function so it is always displayed the same
     @app.template_filter('datetimeformat')
     def datetimeformat(value):
         if value:
             return value.strftime('%Y-%m-%dT%H:%M')
         return ''
-    
+
     return app
