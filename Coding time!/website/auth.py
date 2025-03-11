@@ -1,15 +1,11 @@
 #import flask modules for route handling and get and post requests
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
-
 #imports the database for data handling
 from . import db
-
 #import the user table to check for pre-existing users
 from .models import User, Task, Preferences
-
 #used to handle user data depending on their action
 from flask_login import login_user, login_required, logout_user, current_user
-
 #used to make a WSGI (Web Server Gateway Interface) to handle user security
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -55,7 +51,8 @@ def login():
 
         # If user exists and password matches
         if user and check_password_hash(user.password, password):
-            session['login_attempts'] = 0  # Reset attempts on successful login
+            # Reset attempts on successful login
+            session['login_attempts'] = 0 
             flash('Login successful', 'success')
             login_user(user, remember=True)
             return redirect(url_for('views.home'))
@@ -63,7 +60,7 @@ def login():
         # Increment login_attempts on failed login
         session['login_attempts'] += 1
 
-        # Limit login attempts to prevent brute force attacks
+        # Limit login attempts to prevent brute force attacks or server overload
         if session['login_attempts'] >= 5:
             flash('Too many failed attempts. Please reset your password.', 'danger')
             return redirect(url_for('auth.reset_password'))
@@ -103,6 +100,11 @@ def register():
         if not username or not email or not password:
             flash('All fields are required', 'danger')
             return redirect(url_for('auth.register'))
+        
+        #forces the user to not have special characters in their username
+        if not username.isalnum():
+            flash("Special characters cannot be included in your username, please try again!", "danger")
+            return redirect(url_for("auth.register"))
 
         #dictionary to keep track of password issues
         password_errors = []
