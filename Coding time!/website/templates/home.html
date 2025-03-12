@@ -219,8 +219,16 @@
                             <div class="text-left">Priority: {{ task.priority_str }}</div>
                             <div class="text-left">Difficulty: {{ task.difficulty_str }}</div>
                             <br>
-                            <div class="separator"></div>
-                            <div><strong>Notes: </strong>{{ task.notes or "" }}</div>
+                            <button 
+                                class="btn btn-secondary btn-sm" 
+                                type="button" 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#notes-{{ task.id }}">
+                                Open notes
+                            </button>
+                            <div id="notes-{{ task.id }}" class="collapse mt-2">
+                                {{ task.notes or "No notes available" }}
+                            </div>
                         </div>
 
                     <br>
