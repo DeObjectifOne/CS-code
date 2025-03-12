@@ -55,28 +55,38 @@ def create_task():
                 #this makes sure the user has an input in task details
                 #as a blank task would be unsearchable
                 if not details:
-                    flash("Task details are required", category='error')
-                else:
-                    #a new task variable is created
-                    #it contains the user's new inputs
-                    #before assigning them to the user
-                    #via their id
-                    new_task = Task(
-                        details=details,
-                        duration=duration,
-                        due_date=due_date,
-                        priority=priority,
-                        difficulty=difficulty,
-                        notes=notes,
-                        user_id=current_user.id
-                    )
-                    db.session.add(new_task)
-                    db.session.commit()
-                    flash("Task created successfully", category='success')
-                    #the user is then redirected to the home page
-                    #where they can see their tasks displayed
-                    #using home.html
-                    return redirect(url_for('views.home'))
+                    flash("Task details are required!", category='danger')
+                    return redirect(url_for('utils.create_task'))
+
+                if duration < 0:
+                    flash("the duration cannot be a negative value!", category='danger')
+                    return redirect(url_for('utils.create_task'))
+
+                if due_date.date() < datetime.today().date():
+                    flash("A task cannot be completed in the past!", category='danger')
+                    return redirect(url_for('utils.create_task'))
+
+                #a new task variable is created
+                #it contains the user's new inputs
+                #before assigning them to the user
+                #via their id
+                new_task = Task(
+                    details=details,
+                    duration=duration,
+                    due_date=due_date,
+                    priority=priority,
+                    difficulty=difficulty,
+                    notes=notes,
+                    user_id=current_user.id
+                )
+                db.session.add(new_task)
+                db.session.commit()
+
+                flash("Task created successfully", category='success')
+                #the user is then redirected to the home page
+                #where they can see their tasks displayed
+                #using home.html
+                return redirect(url_for('views.home'))
     
     except ValueError:
         #if there is an invalid input from the user, this comes up
@@ -113,15 +123,21 @@ def edit_task(task_id):
         priority_map = {"Low": 3, "Medium": 2, "High": 1}
         difficulty_map = {"Easy": 1, "Medium": 2, "Hard": 3}
 
-        #check to make sure the due_date variable comes as 'fromisoformat'
-        #this is so the variable can be edited as a normal date
-        #otherwise, the variable is uneditable and the user is redirected
-        if task.due_date:
+        due_date_str = request.form.get('due_date')
+        if due_date_str:
             try:
-                task.due_date = datetime.fromisoformat(task.due_date)
+                task.due_date = datetime.fromisoformat(due_date_str)
             except ValueError:
                 flash("Invalid date format. Please try again.", category="error")
                 return redirect(url_for('utils.edit_task', task_id=task_id))
+
+        if task.duration < 0:
+            flash("the duration cannot be a negative value!", category='danger')
+            return redirect(url_for('utils.edit_task', task_id=task_id))
+
+        if task.due_date.date() < datetime.today().date():
+            flash("A task cannot be completed in the past!", category='danger')
+            return redirect(url_for('utils.edit_task', task_id=task_id))
 
         #the priority and difficulty variables are retrieved by using their mapped variables
         #can be used for automatic task sorting
