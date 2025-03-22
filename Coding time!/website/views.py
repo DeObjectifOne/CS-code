@@ -8,7 +8,9 @@ from .models import Task, Preferences
 from flask_login import login_required, current_user
 #special import for the due_date function specifically
 from datetime import datetime
+#imports scores from sort.py so they can be fed back to sort.py from settings
 from .sort import calculate_scores
+#used to calculate the repositioning of tasks
 from .utils import reposition_task
 
 #blueprint for the views template
@@ -19,31 +21,28 @@ views = Blueprint('views', __name__)
 @login_required
 def home():
 
-
     #search query is empty for user entry
-    search_query = ""
-
+    query = ""
     if request.method == 'POST':
-        search_query = request.form.get('search', "").strip()
-
+        query = request.form.get('search', "").strip()
         #tasks are filtered for specific characters
         tasks = Task.query.filter(
-            #confirmation to ask if task id matches the user's current id
             Task.user_id == current_user.id,
             #uses the ilike function to filter out words specifically
-            Task.details.ilike(f"%{search_query}%")
+            Task.details.ilike(f"%{query}%")
         ).all()
     else:
         #displays all the user's tasks regardless of the search function
         tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.position).all()
 
+    #user preferences imported to the home page to be used
     user_preferences = Preferences.query.filter_by(id=current_user.id).first()
     if user_preferences:
         tasks = calculate_scores(tasks, user_preferences)
 
+    #mapping done to change the integers into string values
     priority_map = {1: "High", 2: "Medium", 3: "Low"}
     difficulty_map = {1: "Easy", 2: "Medium", 3: "Hard"}
-
     for task in tasks:
         task.priority_str = priority_map.get(task.priority, "Low")
         task.difficulty_str = difficulty_map.get(task.difficulty, "Easy")
@@ -51,31 +50,31 @@ def home():
     #the filtered function for tasks_due_today is returned to the user
     today = datetime.utcnow().date()
     tasks_due_today = [task for task in tasks if task.due_date and task.due_date.date() == today]
-    #the filtered function for completed_tasks is returned
-    #the filtered function for starred_tasks is returned
-    completed_tasks = [task for task in tasks if task.completed]
-    starred_tasks = [task for task in tasks if task.starred]
+    #the filtered function(s) are returned
+    completed = [task for task in tasks if task.completed]
+    starred = [task for task in tasks if task.starred]
 
+    #returns the user's home template with all the variables
     return render_template(
         'home.html', 
         user=current_user, 
         tasks=tasks, 
-        search_query=search_query,
+        query=query,
         tasks_due_today=tasks_due_today,
-        completed_tasks=completed_tasks,
-        starred_tasks=starred_tasks
+        completed_tasks=completed,
+        starred_tasks=starred
     )
 
 #route for the settings page
 @views.route('/settings', methods=['GET', 'POST'])
 def settings():
-    user_preferences = Preferences.query.filter_by(user_id=current_user.id).first()
 
+    preferences = Preferences.query.filter_by(user_id=current_user.id).first()
     #if user preferences do not exist, the defaults from the database are used instead
     #the default value for each is 0.25
-    if not user_preferences:
-        user_preferences = Preferences(user_id=current_user.id)
-        db.session.add(user_preferences)
+    if not preferences:
+        preferences = Preferences(user_id=current_user.id)
+        db.session.add(preferences)
         db.session.commit()
 
     if request.method == 'POST':
@@ -87,30 +86,26 @@ def settings():
             duration_weight = float(request.form.get('duration_weight', 0))
             priority_weight = float(request.form.get('priority_weight', 0))
             difficulty_weight = float(request.form.get('difficulty_weight', 0))
-
             #the weights are checked to make sure they all add up to one
             #otherwise the user has to readjust them
-            total_weight = due_date_weight + duration_weight + priority_weight + difficulty_weight
+            total_weight = sum([due_date_weight, duration_weight, priority_weight, difficulty_weight])
             if total_weight != 1:
-                flash("The total of all weightings must equal 1, please adjust your values!", category="error")
+                flash("The total of all weightings must equal 1, please adjust your values!", category="danger")
                 return redirect(url_for('views.settings'))
-
-            #the new weights are now the user's default weights during their next sesson
-            user_preferences.due_date_weight = due_date_weight
-            user_preferences.duration_weight = duration_weight
-            user_preferences.priority_weight = priority_weight
-            user_preferences.difficulty_weight = difficulty_weight
+            #the new weights are now the user's default weights during their next session
+            preferences.due_date_weight = due_date_weight
+            preferences.duration_weight = duration_weight
+            preferences.priority_weight = priority_weight
+            preferences.difficulty_weight = difficulty_weight
             db.session.commit()
-
             flash("Your preferences have been updated successfully!", category="success")
+
         except ValueError:
             #used so that all non-float characters are rejected
-            #the only character that can be accepted but is not a float is one\
-            #if the rest of the weights are set to zero
-            flash("Invalid input, please enter numeric values!", category="error")
+            flash("Invalid input, please enter numeric values!", category="danger")
             return redirect(url_for('views.settings'))
 
-    return render_template('settings.html', user=current_user, user_preferences=user_preferences)
+    return render_template('settings.html', user=current_user, user_preferences=preferences)
 
 
 #route for manual task moving
@@ -119,21 +114,19 @@ def settings():
 def reposition():
 
     #keeps track of tasks and their requested position
-    task_id = request.form.get('task_id')
+    id = request.form.get('task_id')
     direction = request.form.get('direction')
 
-    if task_id and direction:
-
+    if id and direction:
         #function call made to reposition the task
-        task = reposition_task(current_user.id, task_id, direction)
-
-        #if the movement was successful, a message is sent
+        task = reposition_task(current_user.id, id, direction)
+        #if the movement is successful, a message is sent
         if task:
             flash(f"'{task.details}' has been moved {direction}!", category="success")
         #otherwise it is deemed a failure
         else:
-            flash("An error had occured and your task could not be moved!", category="error")
+            flash("An error had occured and your task could not be moved!", category="danger")
     else:
-        flash("Invalid task or input made, please try again!", category="error")
+        flash("Invalid task or input made, please try again!", category="danger")
 
     return redirect(url_for('views.home'))
