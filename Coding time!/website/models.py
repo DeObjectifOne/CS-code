@@ -11,19 +11,13 @@ class User(db.Model, UserMixin):
     __tablename__ = 'users'
     #used as a primary identifier for finding items
     id = db.Column(db.Integer, primary_key=True)
-    #the 3 essential variables for storing user details
-    #can be used for authentication
+    #user details for authentication
     username = db.Column(db.String(150), nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
-    #variable used to link the user's task to the user account
-    #does this by joining the 2 tables using the lazy=True function
-    #the backref is used to declare this property inside the Task class for linkage
+    #variable used to link the user's tasks to the user account
     tasks = db.relationship('Task', backref='user', lazy=True)
-    #similar to the tasks variable in that it links the Preferences class to the User class
-    #like the task variable, it too is joined to the user class by lazy=True
-    #the uselist=False is used to make it a one-to-one relationship
-    #this makes the preferences variable exclusive to the user
+    #variable used to link the user's preferences to the user account
     preferences = db.relationship('Preferences', backref='preferences_user', lazy=True, uselist=False)
 
 #task table
@@ -33,19 +27,17 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     #stores the task details for searching
     details = db.Column(db.String(150), nullable=False)
-    #uses the correct timezone to display the date of creation
+    #stores the rest of the task attributes
     due_date = db.Column(db.DateTime, nullable=True)
     creation_date = db.Column(db.DateTime, default=datetime.utcnow())
     duration = db.Column(db.Integer, nullable=False)
-    #these two variables, though displayed as string variables, are stored as integers
-    #this is due to the variables being mapped to numbers upon their entry
     priority = db.Column(db.Integer, nullable=False)
     difficulty = db.Column(db.Integer, nullable=False)
     notes = db.Column(db.Text, nullable=True)
     #variables used for task filtering
     completed = db.Column(db.Boolean, default=False)
     starred = db.Column(db.Boolean, default=False)
-    #position value so the database knows where the task is in the lisy
+    #position value so the database knows where the task is in the list
     position = db.Column(db.Integer, default=0)
     #variable used to link all tasks back to the required user
     #a ForeignKey is used so the Task class is directly linked back to the User class
