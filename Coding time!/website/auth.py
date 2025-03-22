@@ -12,15 +12,13 @@ from werkzeug.security import check_password_hash, generate_password_hash
 #blueprint for the auth template
 auth = Blueprint('auth', __name__)
 
-import re
-
 #route for the login page
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
 
     # Prevent already authenticated users from logging in again
     if current_user.is_authenticated:
-        flash('You are already logged in', 'info')
+        flash('You are already logged into website!', category='info')
         return redirect(url_for('views.home'))
 
     # Initialize login_attempts in the session if it doesn't exist
@@ -33,39 +31,39 @@ def login():
 
         # Ensure all fields are completed
         if not username_or_email or not password:
-            flash('All fields are required', 'danger')
+            flash('All fields are required, please try again!', category='danger')
             return render_template('login.html')
 
         #Check if user exists via email
         if "@" in username_or_email:
             user = User.query.filter_by(email=username_or_email).first()
             if not user:
-                flash('No user has been found with this email', 'danger')
+                flash('No user has been found with this email', category='danger')
                 return render_template('login.html')
         #Otherwise, their password is checked
         else:
             user = User.query.filter_by(username=username_or_email).first()
             if not user:
-                flash('No account has been found with this username', 'danger')
+                flash('No account has been found with this username', category='danger')
                 return render_template('login.html')
 
         # If user exists and password matches
         if user and check_password_hash(user.password, password):
             # Reset attempts on successful login
             session['login_attempts'] = 0 
-            flash('Login successful', 'success')
+            flash('Login was successfull, enjoy using the app!', category='success')
             login_user(user, remember=True)
             return redirect(url_for('views.home'))
-
+        
         # Increment login_attempts on failed login
         session['login_attempts'] += 1
-
         # Limit login attempts to prevent brute force attacks or server overload
         if session['login_attempts'] >= 5:
-            flash('Too many failed attempts. Please reset your password.', 'danger')
+            flash('Too many failed attempts. Please reset your password.', category='danger')
             return redirect(url_for('auth.reset_password'))
 
-        flash('Invalid username/email or password', 'danger')
+        #general error incase any inputs do not make sense
+        flash('Invalid username/email or password', category='danger')
         return render_template('login.html')
 
     return render_template('login.html')
@@ -86,7 +84,7 @@ def register():
     #function that prevents the user from registering
     #detects this by seeing if the user is authenticated
     if current_user.is_authenticated:
-        flash('You are already logged in', 'info')
+        flash('You are already logged in', category='info')
         return redirect(url_for('views.home'))
 
     #main registration function
@@ -98,25 +96,21 @@ def register():
 
         #function to make sure all fields are complete
         if not username or not email or not password:
-            flash('All fields are required', 'danger')
+            flash('All fields are required, please try again!', category='danger')
             return redirect(url_for('auth.register'))
-        
         #forces the user to not have special characters in their username
         if not username.isalnum():
-            flash("Special characters cannot be included in your username, please try again!", "danger")
+            flash("Special characters cannot be included in your username, please try again!", category="danger")
             return redirect(url_for("auth.register"))
 
         #dictionary to keep track of password issues
         password_errors = []
-
         #password required to be atleast 8 characters
         if len(password) < 8:
             password_errors.append("The password must be, at minimum, 8 characters long")
-
         #the password must also have atleast one number
         if not any(char.isdigit() for char in password):
             password_errors.append("The password must contain at least one number or more")
-
         #password must atleast contain one special character as listed below
         special_characters =  r'!@#$%^&*(),.?":{}|<>'
         if not any(char in special_characters for char in password):
@@ -125,14 +119,14 @@ def register():
         #if any of the errors are detected, the page will reload
         if password_errors:
             for error in password_errors:
-                flash(error, 'danger')
+                flash(error, category='danger')
             return redirect(url_for('auth.register'))
 
         #the user's details are checked to see if a duplicate email exists
         user = User.query.filter_by(email=email).first()
 
         if user:
-            flash('A user with this email already exists', 'danger')
+            flash('A user with this email already exists, use a different email!', category='danger')
             return redirect(url_for('auth.login'))
         else:
             try:
@@ -151,9 +145,10 @@ def register():
                 flash('Registration successful', 'success')
                 return redirect(url_for('views.home'))
             #function for if any errors occur during the process
+
             except Exception as e:
                 db.session.rollback()
-                flash('An error occured while trying you register you, please try again', 'danger')
+                flash('An error occured while trying you register you, please try again!', category='danger')
                 print(f"Error: {e}")
 
     return render_template('register.html', user=current_user)
@@ -171,49 +166,42 @@ def reset_password():
 
         #forces the user to fill out all the fields
         if not username_or_email or not new_password or not confirm_password:
-            flash("All fields are required.", 'danger')
+            flash("All fields are required, please fill them!", category='danger')
             return render_template('reset_password.html')
-
-
         #checks if the provided email exists
         if "@" in username_or_email:
             user = User.query.filter_by(email=username_or_email).first()
             if not user:
-                flash('No user has been found with this email', 'danger')
+                flash('No user has been found with this email, make a new account!', category='danger')
                 return render_template('reset_password.html')
         #the same is done if the user's provided username does not exist
         else:
             user = User.query.filter_by(username=username_or_email).first()
             if not user:
-                flash('No account has been found with this username', 'danger')
+                flash('No account has been found with this username, make a new account!', category='danger')
                 return render_template('reset_password.html')
-
         #both instances of the new password have to match
         #common practice on similar websites
         if new_password != confirm_password:
-            flash("Passwords do not match.", 'danger')
+            flash("Passwords do not match!", category='danger')
             return render_template('reset_password.html')
         
         #the new_passwords are checked to see if they meet the criteria
         password_errors = []
-
         #the new password has to be atleast 8 characters long
         if len(new_password) < 8:
             password_errors.append("The password must be, at minimum, 8 characters long")
-
         #the new password must also contain at least one number
         if not any(char.isdigit() for char in new_password):
             password_errors.append("The password must contain at least one number or more")
-
         #the new password must contain at least one special character
         special_characters =  r'!@#$%^&*(),.?":{}|<>'
         if not any(char in special_characters for char in new_password):
             password_errors.append("The password must contain at least one special character")
-
         #if any of the aforementioned errors are detected, the user is forced back to the login page
         if password_errors:
             for error in password_errors:
-                flash(error, 'danger')
+                flash(error, category='danger')
             return redirect(url_for('auth.reset_password'))       
 
         #the new password is accepted otherwise and hashed for extra security
@@ -221,7 +209,7 @@ def reset_password():
         db.session.commit()
 
         #with the new password now in the database, the user can now login again
-        flash("Password reset successful. Please log in.", 'success')
+        flash("Password reset successful, try and login again!", category='success')
         return redirect(url_for('auth.login'))
 
     return render_template('reset_password.html')
@@ -243,35 +231,30 @@ def update_account():
         #if they want to change one detail, they simply leave the other two details alone
         #they will be automatically filled with the original details
         if not new_username or not new_email or not new_password:
-            flash('All fields are required', 'danger')
+            flash('All fields are required, please fill them all!', category='danger')
             return render_template('account.html')
-
         #if the user re-enters their email, they're told they are already using said email
-        existing_user = User.query.filter_by(email=new_email).first()
-        if existing_user and existing_user.id != current_user.id:
-            flash("You are already using this email", 'danger')
+        extant = User.query.filter_by(email=new_email).first()
+        if extant and extant.id != current_user.id:
+            flash("This email is already in use!", category='danger')
             return redirect(url_for('views.settings'))
 
         #password dictionary to keep track of errors
         password_errors = []
-
         #the new password must be atleast 8 characters
         if len(new_password) < 8:
             password_errors.append("The password must be, at minimum, 8 characters long")
-
         #it must also contain atleast one number
         if not any(char.isdigit() for char in new_password):
             password_errors.append("The password must contain at least one number or more")
-
         #it must also contain at least one special character from the provided list
         special_characters =  r'!@#$%^&*(),.?":{}|<>'
         if not any(char in special_characters for char in new_password):
             password_errors.append("The password must contain at least one special character")
-
         #if any of these errors are added to the list, the user is forced to reload the page
         if password_errors:
             for error in password_errors:
-                flash(error, 'danger')
+                flash(error, category='danger')
             return redirect(url_for('auth.update_account'))
         
         #if the changes go through, the new details replace the original details
@@ -284,7 +267,7 @@ def update_account():
 
         #changes are saved to the database
         db.session.commit()
-        flash("Account updated successfully", 'success')
+        flash("Your account has been updated successfully!", category='success')
         return redirect(url_for('views.home'))
 
     return render_template('account.html', user=current_user)
@@ -308,7 +291,7 @@ def delete_account():
             #changes are saved
             db.session.commit()
             #message sent to the user
-            flash('Your account and all associated data have been successfully deleted. Thank you for using our website!', 'success')
+            flash('Your account and all associated data have been successfully deleted. Thank you for using our website!', category='success')
             return redirect(url_for('auth.login'))
         else:
             #otherwise, the account is unable to be found and the function cancelled
