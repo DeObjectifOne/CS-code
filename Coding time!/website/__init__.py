@@ -16,8 +16,11 @@ DB_NAME = "database.db"
 #app function that instantiates all connected roots
 def create_app():
     
+    #establishes the website whenever run
     app = Flask(__name__)
+    #secret key established to be used for in-app security
     app.secret_key = secrets.token_hex(24)
+    #establishes the database each time the session begins, even if there is none
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     db.init_app(app)
 
@@ -28,6 +31,7 @@ def create_app():
     from .sort import sort
     from .customization import customization
 
+    #adds an identifier so they can be easily registerded
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(utils, url_prefix='/')
@@ -49,45 +53,40 @@ def create_app():
     def load_user(id):
         return User.query.get(int(id))
     
+    #makes the user available across all Jinja templates
+    #makes it so the user does not need manual importing into all templates
     @app.context_processor
     def inject_user():
-        return {'user': current_user}
-    
-    @app.context_processor
-    def inject_current_page():
-        
-        page_names = {
-            'views.home': 'Home',
-            'utils.create_task': 'Add Task',
-            'views.settings': 'Settings',
-            'auth.logout': 'Logout',
-            'auth.login': 'Login',
-            'auth.register': 'Register',
+        return {
+            'user': current_user,
+            'current_page' : {
+                'views.home': 'Home',
+                'utils.create_task': 'Add Task',
+                'views.settings': 'Settings',
+                'auth.logout': 'Logout',
+                'auth.login': 'Login',
+                'auth.register': 'Register',
+            }.get(request.endpoint, 'Unknown Page')
         }
-
-        current_page = page_names.get(request.endpoint, 'Unknown Page')
-        return {'current_page': current_page}
     
+    #Makes sure the user can only go to certain webpages when logged out
     @app.before_request
-    def redirect_if_not_logged_in():
-        if not current_user.is_authenticated:
-            if request.endpoint not in ['auth.login', 'auth.register', 'auth.reset_password']:
-                return redirect(url_for('auth.login')) 
+    def logout_state():
+        if not current_user.is_authenticated and request.endpoint not in ['auth.login', 'auth.register', 'auth.reset_password']:
+            return redirect(url_for('auth.login')) 
 
+    #makes sure to set the theme to the user's default each time a new session is run
     @app.before_request
-    def apply_user_theme():
+    def set_theme():
         if current_user.is_authenticated:
             preferences = Preferences.query.filter_by(user_id=current_user.id).first()
-            g.theme = preferences.theme if preferences and preferences.theme else 'light'
+            g.theme = preferences.theme if preferences else 'light'
         else:
             g.theme = session.get('theme', 'light') 
 
-    #makes it so the due_date variable from models.py is modelled uniformally
-    #as a datetime function so it is always displayed the same
+    #formats date time variables universally for ease of import
     @app.template_filter('datetimeformat')
-    def datetimeformat(value):
-        if value:
-            return value.strftime('%Y-%m-%dT%H:%M')
-        return ''
+    def date_formatting(value):
+            return value.strftime('%Y-%m-%dT%H:%M') if value else ''
 
     return app
